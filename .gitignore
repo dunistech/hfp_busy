@@ -1,0 +1,18 @@
+# Ignore the virtual environment folder
+venv/
+env/
+# Ignore Python cache files
+__pycache__/
+
+# Ignore environment variables
+.env
+*.sql
+*.dump
+
+# Ignore the file steps_to_create_gitignore_and_requirements.txt
+steps_to_create_gitignore_and_requiremen_database_export
+
+
+
+# Ignore log files
+*.log

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Packages Start -->
+<div class="container-fluid py-5">
+    <div class="container pt-5 pb-3">
+        <div class="text-center mb-3 pb-3">
+            <h1>Businesses in {{ category_name }}</h1>
+        </div>
+        <div class="row justify-content-center">
+            {% if businesses %}
+            {% for business in businesses %}
+            <div class="{% if businesses|length == 1 %}col-lg-6 col-md-8 col-sm-10 col-12{% elif businesses|length == 2 %}col-lg-6 col-md-6 col-sm-8 col-12{% else %}col-lg-3 col-md-4 col-sm-6 col-12{% endif %} mb-4">
+                <div class="package-item bg-white mb-2 h-100">
+                    {% if business[7] and business[8] %}
+                    {% if business[7] == 'image' %}
+                    <div class="image-container" style="height: 200px; overflow: hidden;">
+                        <h6 class="m-0"><i class="fa fa-star text-primary mr-2"
+                                style="position: absolute; text-shadow: 2px 2px 4px rgba(216, 216, 216, 0.5);"><span>premier</span></i>
+                        </h6>
+                        <img src="../{{ business[8] }}" alt="Business Image" class="img-fluid"
+                            style="object-fit: cover; width: 100%; height: 100%;">
+                    </div>
+                    {% elif business[7] == 'video' %}
+                    <div class="image-container" style="height: 200px; overflow: hidden;">
+                        <h6 class="m-0"><i class="fa fa-star text-primary mr-2"
+                                style="position: absolute; text-shadow: 2px 2px 4px rgba(216, 216, 216, 0.5);"><span>premier</span></i>
+                        </h6>
+                        <video width="100%" height="100%" controls
+                            style="object-fit: cover; width: 100%; height: 100%;">
+                            <source src="../{{ business[8] }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="image-container" style="height: 200px; overflow: hidden;">
+                        <h6 class="m-0"><i class="fa fa-star text-primary mr-2"
+                                style="position: absolute;"><span>premier</span></i></h6>
+                                <a href="{{url_for('register_user')}}">
+                                <img src="../../static/img/dunis_placeholder.png"  alt="Business Image"
+                            class="img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
+                        </a>
+                        {#<p class="text-center" style="line-height: 200px;">No media uploaded for this business yet.
+                        </p>#}
+                    </div>
+                    {% endif %}
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <small class="m-0"><i class="fa fa-phone-alt text-primary mr-2"></i>{{ business[4]}}</small>
+                            <small class="m-0"><i class="fa fa-store text-primary mr-2"></i>{{ business[11]}}</small>
+                        </div>
+                        <a class="h5 text-decoration-none"
+                            style="display: flex !important; justify-content: center !important; font-weight: bold;"
+                            href="{{url_for('register_user')}}">{{ business[2] }}</a>
+                        <div class="border-top mt-4 pt-4">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <h6 class="m-0">
+                                    <span><i class="fa fa-shield-alt text-primary mr-2"></i>Trust <small>[<span
+                                                class="text-primary">{{business[2]}}</span>] for</small></span>
+                                    <span style="display: flex; justify-content: center; margin-top: 3px;">{{
+                                        business[11]}}</span>
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12 text-center" style="background-color: #040450; padding: 10px;">
+                <h4 style="color: #fff">No businesses found in the <span style="color: #7AB730;">"{{ category_name }}"
+                    </span> category.</h4>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Packages End -->
+
+{% endblock %}

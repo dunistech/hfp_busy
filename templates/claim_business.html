@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    /* Container with Gradient Animation */
+    .gradient-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(45deg, #3030ff, #ffffff, #00aaff);
+        background-size: 400% 400%;
+        animation: gradientAnimation 10s ease infinite;
+    }
+
+    @keyframes gradientAnimation {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    /* Claim Form Styling */
+    .claim-form-container {
+        max-width: 600px;
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .claim-form .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .claim-form .form-group label {
+        width: 40%;
+        font-size: 0.9rem;
+        color: #333;
+        margin-right: 10px;
+    }
+
+    .claim-form .form-control {
+        width: 60%;
+        font-size: 0.85rem;
+        padding: 5px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+    }
+
+    .claim-form .form-control:focus {
+        border-color: #66afe9;
+        outline: none;
+    }
+
+    .claim-form .btn-submit {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: block;
+        margin: 20px auto 0 auto;
+        width: auto;
+    }
+
+    .claim-form .btn-submit:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+
+<div class="gradient-container">
+    <div class="claim-form-container">
+        <h1 class="text-center">Claim Business</h1>
+        <form action="" method="POST" class="claim-form">
+            <div class="form-group">
+                <label for="business_name">Business Name:</label>
+                <input type="text" id="business_name" name="business_name" value="{{ business[2] }}" readonly
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="shop_no">Shop Number:</label>
+                <input type="text" id="shop_no" name="shop_no" value="{{ business[3] }}" readonly class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="block_num">Block Number:</label>
+                <input type="text" id="block_num" name="block_num" value="{{ business[9] }}" readonly
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Phone Number:</label>
+                <input type="text" id="phone_number" name="phone_number" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="category">Business Category:</label>
+                <select id="category" name="category" required class="form-control">
+                    {% for category in categories %}
+                    <option value="{{category.name}}">{{category.name}}</option>
+                    {% endfor %}
+                    <!-- Add more categories as needed -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="4" required class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit">Submit Claim Request</button>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

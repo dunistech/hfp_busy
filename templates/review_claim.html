@@ -1,0 +1,90 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<main id="main" class="main">
+    <h1>Admin Dashboard</h1>
+
+    <!-- Claim Details Form -->
+    <h2 class="table-title text-center">Claim Details</h2>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <form action="" method="POST" class="small-form">
+                    <div class="mb-2">
+                        <label for="user" class="form-label">User</label>
+                        <input type="text" id="user" class="form-control form-control-sm" value="{{ claim_request[2] }}"
+                            readonly>
+                    </div>
+                    <div class="mb-2">
+                        <label for="business_name" class="form-label">Business Name</label>
+                        <input type="text" id="business_name" class="form-control form-control-sm"
+                            value="{{ claim_request[1] }}" readonly>
+                    </div>
+                    <div class="mb-2">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="text" id="phone_number" class="form-control form-control-sm"
+                            value="{{ claim_request[3] }}" readonly>
+                    </div>
+                    <div class="mb-2">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" id="email" class="form-control form-control-sm"
+                            value="{{ claim_request[4] }}" readonly>
+                    </div>
+                    <div class="mb-2">
+                        <label for="category" class="form-label">Category</label>
+                        <input type="text" id="category" class="form-control form-control-sm"
+                            value="{{ claim_request[5] }}" readonly>
+                    </div>
+                    <div class="mb-2">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" class="form-control form-control-sm" rows="4"
+                            readonly>{{ claim_request[6] }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm">Approve Claim</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</main><!-- End #main -->
+
+{% endblock %}
+
+<style>
+    /* Custom styles for the small form */
+    .small-form {
+        max-width: 100%;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+        /* Set font size for smaller text */
+    }
+
+    .small-form .form-label {
+        font-size: 14px;
+        /* Smaller font size for labels */
+    }
+
+    .small-form .form-control-sm {
+        font-size: 14px;
+        /* Smaller font size for inputs and textareas */
+        padding: 0.5rem;
+        /* Smaller padding */
+    }
+
+    .small-form textarea {
+        resize: none;
+        /* Prevent resizing of textarea */
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        /* Smaller button padding */
+        font-size: 14px;
+        /* Smaller font size for button */
+    }
+</style>

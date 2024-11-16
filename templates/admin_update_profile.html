@@ -1,0 +1,116 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<main id="main" class="main">
+    <h1>Update Profile</h1>
+
+
+    <section class="section profile">
+        <div class="row">
+            <div class="col-xl-4">
+
+                <div class="card">
+                    <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+
+                        <img src="../{{ admin[4] }}" alt="Profile" class="rounded-circle"
+                            style="width: 120px; height: 120px; object-fit: cover;  border: 2px solid #ccc;">
+                        <h2>{{ admin[1] }}</h2>
+                        <h3>{{ admin[2] }}</h3>
+                        <div class="social-links mt-2">
+                            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-xl-8">
+
+                <div class="card">
+                    <div class="card-body pt-3">
+                        <!-- Bordered Tabs -->
+                        <ul class="nav nav-tabs nav-tabs-bordered">
+
+                            <li class="nav-item">
+                                <button class="nav-link active" data-bs-toggle="tab"
+                                    data-bs-target="#profile-overview">Edith Profile</button>
+                            </li>
+
+                        </ul>
+                        <div class="tab-content pt-2">
+
+                            <div class="tab-pane fade show active profile-edith " id="profile-edith">
+                                <!-- Profile Edit Form -->
+                                <form action="{{ url_for('update_admin_profile') }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    <div class="row mb-3">
+                                        <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile
+                                            Image</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            <img src="../{{ admin[4] }}" alt="Profile" class="rounded-circle"
+                                                style="width: 70px; height: 70px; object-fit: cover;  border: 2px solid #ccc;">
+                                            <div class="pt-2">
+                                                <label for="profile_pic" class="btn btn-primary btn-sm"
+                                                    title="Upload new profile image">
+                                                    <i class="bi bi-upload"></i> Upload New Image
+                                                    <input type="file" name="profile_pic" id="profile_pic"
+                                                        style="display: none;">
+                                                </label>
+                                                <a href="#" class="btn btn-danger btn-sm"
+                                                    title="Remove my profile image"><i class="bi bi-trash"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label for="fullName" class="col-md-4 col-lg-3 col-form-label">User Name</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            <input name="username" type="text" class="form-control" id="fullName"
+                                                value="{{ admin[1] }}">
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            <input name="email" type="email" class="form-control" id="Email"
+                                                value="{{ admin[2] }}">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="Password" class="col-md-4 col-lg-3 col-form-label">Current
+                                            Password:</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            <input name="password" type="password" class="form-control"
+                                                placeholder="Current password (required for changes)">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="Password" class="col-md-4 col-lg-3 col-form-label">New
+                                            Password:</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            <input name="new_password" type="password" class="form-control"
+                                                placeholder="New password">
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                                    </div>
+                                </form><!-- End Profile Edit Form -->
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+    </section>
+
+</main><!-- End #main -->
+
+{% endblock %}

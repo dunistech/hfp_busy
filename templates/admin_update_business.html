@@ -1,0 +1,56 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<main id="main" class="main">
+    <h1>Update Business</h1>
+
+    <div class="form-container">
+        <form action="{{ url_for('update_business', business_id=business[0]) }}" method="POST">
+            <div class="form-group">
+                <label for="business_name">Business Name:</label>
+                <input type="text" id="business_name" name="business_name" value="{{ business[2] }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="shop_no">Shop No:</label>
+                <input type="text" id="shop_no" name="shop_no" value="{{ business[3] }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone_number">Phone Number:</label>
+                <input type="text" id="phone_number" name="phone_number" value="{{ business[4] }}">
+            </div>
+            <div class="form-group">
+                <label for="category">Business Category:</label>
+                <select id="category" name="category" required>
+                    {% for category in categories %}
+                    <option value="{{category.name}}">{{category.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ business[10] }}">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description">{{ business[5] }}</textarea>
+            </div>
+
+            <div class="subscribe-group">
+                <label for="is_subscribed" class="subscribe-label">
+                    {{ 'Subscribed' if business[6] else 'Not Subscribed' }}:
+                </label>
+                <input type="checkbox" id="is_subscribed" name="is_subscribed" {% if business[6] %}checked{% endif %}>
+            </div>
+
+            <button type="submit" class="btn-submit">Update</button>
+        </form>
+
+        <a href="{{ url_for('admin_users') }}" class="btn-back">Back to User Management</a>
+    </div>
+</main><!-- End #main -->
+
+{% endblock %}

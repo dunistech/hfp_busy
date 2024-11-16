@@ -1,0 +1,30 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<main id="main" class="main">
+    <h1>Admin Profile</h1>
+    <div class="col-xl-8">
+
+        <div class="card">
+            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                
+                <img src="../{{ admin[4] }}" alt="Profile" class="rounded-circle"
+                    style="width: 150px; height: 150px; object-fit: cover;  border: 2px solid #ccc;">
+                <h2>{{ admin[1] }}</h2>
+                <h3>{{ admin[2] }}</h3>
+                <div class="social-links mt-2">
+                    <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+            <a href="{{ url_for('update_admin_profile') }}" style="text-align: center;">Edit Profile</a>
+
+        </div>
+
+    </div>
+
+</main><!-- End #main -->
+
+{% endblock %}

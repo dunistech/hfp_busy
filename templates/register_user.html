@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>HFP Business Directory</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="{{ logo_path }}" rel="icon">
+    <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/quill/quill.snow.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/quill/quill.bubble.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/remixicon/remixicon.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/simple-datatables/style.css') }}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+
+<body>
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="flash-message {{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.flash-message').forEach(function (message) {
+                message.addEventListener('click', function () {
+                    message.classList.add('fade-out');
+                    setTimeout(function () {
+                        message.remove();
+                    }, 500); // Wait for the fade-out transition to finish
+                });
+            });
+        });
+
+    </script>
+    <main>
+        <div class="container">
+            <section
+                class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-5 col-md-6 d-flex flex-column align-items-center justify-content-center">
+
+                            <div class="d-flex justify-content-center py-4">
+                                <a href="index.html" class="logo d-flex align-items-center w-auto">
+                                    <img src="assets/img/logo.png" alt="">
+                                    <span class="d-none d-lg-block">Account/Business Registrations 
+                                        <a class="h4" href="{{ url_for('index') }}">Back to Home</a> </span>
+                                </a>
+                            </div><!-- End Logo -->
+                            <!-- --- ---->
+                            <div class="card-body">
+                                <div class="new-user-info">
+                                    <form action="{{ url_for('register_user') }}" method="POST"
+                                        class="row g-3 needs-validation" novalidate>
+                                        <div class="row">
+                                            <div class="form-group col-md-6">
+                                                <label for="name">Phone</label>
+                                                <input class="form-control" id="phone" maxlength="20" minlength="2"
+                                                    name="phone" placeholder="phone" required="" type="tel">
+
+                                            </div>
+
+                                            <div class="form-group col-md-6">
+                                                <label for="email">Email:</label>
+                                                <input type="email" class="form-control" name="email" id="email"
+                                                    placeholder="email addres">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="form-group col-md-6">
+                                                <label for="name">Website Url</label>
+                                                <input class="form-control" id="phone" maxlength="20" minlength="2"
+                                                    name="website_url" placeholder="Your website Link Here" required="" type="text">
+
+                                            </div>
+
+                                            <div class="form-group col-md-6">
+                                                <label for="social_handles">Social Handle:</label>
+                                                <input type="text" class="form-control" name="social_handles" id="social_handles"
+                                                    placeholder="Your Social Mdeia Handle">
+                                            </div>
+                                        </div>
+                                        
+                                            <div class="form-group col-md-12 col-sm-12">
+                                                <label>description:</label>
+
+                                                <textarea class="form-control" id="description" name="description"
+                                                    placeholder="description" rows="2"></textarea>
+
+                                            </div>
+
+                                            <div class="form-group col-md-12">
+                                                <label for="name">Business Name:</label>
+                                                <input class="form-control" id="name" name="name"
+                                                    placeholder="Enter Your name" type="text">
+
+                                            </div>
+
+                                </div>
+
+                                <hr>
+                                <div class="row">
+
+                                    <div class="form-group col-md-4">
+                                        <label for="shop_no">Shop Numbr:</label>
+                                        <input class="form-control" id="shop_no" name="shop_no" placeholder="Shop no"
+                                            type="number">
+
+                                    </div>
+
+                                    <div class="form-group col-md-4">
+                                        <label for="block_num">Block Number:</label>
+                                        <input class="form-control" id="block_num" name="block_num"
+                                            placeholder="block no" type="text">
+
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="category">Select Category:</label>
+
+                                        <select class="form-control" id="category" name="category"
+                                            placeholder="category">
+                                            {% for category in categories %}
+                                            <option value="{{category.name}}">{{category.name}}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <hr>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label for="username">Username:</label>
+                                        <input class="form-control" id="username" placeholder="username" maxlength="20"
+                                            minlength="2" name="username" required="" type="text">
+
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="password">Password:</label>
+
+                                        <input class="form-control" id="password" name="password" placeholder="Password"
+                                            type="password">
+
+                                    </div>
+                                </div>
+                                <div class="checkbox">
+                                    <label><input class="mr-2" checked="" type="checkbox">Agree to Dunis terms &amp;
+                                        conditions</label>
+                                </div>
+                                <div id="response" class="alert"></div>
+                                <input class="btn btn-primary btn-lg" id="submit" name="submit" type="submit"
+                                    value="Submit Registrations">
+
+                                </form>
+
+                                <div class="col-12">
+                                    <p class="small mb-0">Already have an account? <a
+                                            href="{{ url_for('user_login') }}">Login</a> or
+                                        <a href="{{ url_for('forgot_password') }}">forgotton password</a>
+                                    </p>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        </section>
+
+        </div>
+    </main><!-- End #main -->
+
+
+    <!-- Vendor JS Files -->
+    <script src="{{ url_for('static', filename='vendor/apexcharts/apexcharts.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/chart.js/chart.umd.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/echarts/echarts.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/quill/quill.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/simple-datatables/simple-datatables.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/tinymce/tinymce.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/php-email-form/validate.js') }}"></script>
+
+    <!-- Template Main JS File -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>

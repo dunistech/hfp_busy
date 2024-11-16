@@ -1,0 +1,215 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<main id="main" class="main">
+    <h1>Admin Dashboard</h1>
+    <div class="requests-container">
+        <div class="request-box red">
+            <i class="fas fa-user-plus"></i>
+            <p>Pending Users Signin</p>
+            <span class="count">{{ pending_user_registration_request_count }}</span>
+        </div>
+        <div class="request-box green">
+            <i class="fas fa-briefcase"></i>
+            <p>Pending Users To Be Approved</p>
+            <span class="count">{{ pending_approved_user_count }}</span>
+        </div>
+        <div class="request-box blue">
+            <i class="fas fa-user-check"></i>
+            <p>Pending Business To Be Processed</p>
+            <span class="count">{{ pending_business_registration_requests_count }}</span>
+        </div>
+        <div class="request-box yellow">
+            <i class="fas fa-briefcase"></i>
+            <p>Pending Businesses Claimed</p>
+            <span class="count">{{ pending_claim_requests_count }}</span>
+        </div>
+    </div>
+
+
+    <!-- Row container for User Registration Requests and Approve Users tables -->
+    <div class="tables-row">
+        <!-- User Registration Requests Table -->
+        <div class="table-container">
+            <p>Business Register Requests ({{ pending_user_registration_request_count }})</p>
+            {% if user_requests %}
+            <table class="table-user-requests" border="1">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in user_requests %}
+                    <tr>
+                        <td>{{ request[1] }}</td>
+                        <td>{{ request[3] }}</td>
+                        <td>
+                            {% if not request[5] %}
+                            <form action="{{ url_for('process_user_registration') }}" method="POST">
+                                <input type="hidden" name="username" value="{{ request[1] }}">
+                                <input type="hidden" name="email" value="{{ request[3] }}">
+                                <input type="hidden" name="password" value="{{ request[2] }}">
+                                <input type="hidden" name="name" value="{{ request[6] }}">
+                                <input type="hidden" name="phone" value="{{ request[7] }}">
+                                <button type="submit">Register User</button>
+                            </form>
+                            {% else %}
+                            Processed
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No user registration requests.</p>
+            {% endif %}
+        </div>
+
+        <!-- Approve Users Table -->
+        <div class="table-container">
+            <p>Approval Requests ({{ pending_approved_user_count }})</p>
+            {% if users %}
+            <table class="table-approve-users" border="1">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user[1] }}</td>
+                        <td>{{ user[2] }}</td>
+                        <td>
+                            {% if user[5] and user[9] %}
+                            Approved
+                            {% elif user[5] and not user[9] %}
+                            Pending Activation
+                            {% else %}
+                            Not Approved
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not user[5] %}
+                            <form action="{{ url_for('approve_user') }}" method="POST" onsubmit="showLoading(this);">
+                                <input type="hidden" name="username" value="{{ user[1] }}">
+                                <button type="submit">Approve</button>
+                            </form>
+                            {% elif user[5] and not user[9] %}
+                            Pending Activation
+                            {% else %}
+                            Approved
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No users to approve.</p>
+            {% endif %}
+        </div>
+    </div>
+
+
+    <!-- Business Registration Requests Table -->
+    <div style="overflow-x: auto;">
+        <p>Pending Business To Be Processed ({{ pending_business_registration_requests_count }})</p>
+        {% if business_requests %}
+        <table class="table-business-requests" border="1">
+            <thead>
+                <tr>
+                    <th>Business Name</th>
+                    <th>Shop No</th>
+                    <th>Block Number</th>
+                    <th>Category</th>
+                    <th>Phone Number</th>
+                    <th>Description</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                {% for request in business_requests %}
+                <tr>
+                    <td>{{ request[1] }}</td>
+                    <td>{{ request[2] }}</td>
+                    <td>{{ request[9] }}</td>
+                    <td>{{ request[8] }}</td>
+                    <td>{{ request[3] }}</td>
+                    <td>{{ request[4] }}</td>
+                    <td>{{ request[10] }}</td>
+                    <td>
+                        {% if not request[5] %}
+                        <form action="{{ url_for('process_business_registration') }}" method="POST">
+                            <input type="hidden" name="user_id" value="{{ request[7] }}">
+                            <input type="hidden" name="business_name" value="{{ request[1] }}">
+                            <input type="hidden" name="shop_no" value="{{ request[2] }}">
+                            <input type="hidden" name="phone_number" value="{{ request[3] }}">
+                            <input type="hidden" name="description" value="{{ request[4] }}">
+                            <input type="hidden" name="block_num" value="{{ request[9] }}">
+                            <input type="hidden" name="category" value="{{ request[8] }}">
+                            <input type="hidden" name="email" value="{{ request[10] }}">
+                            <button type="submit">Register Business</button>
+                        </form>
+                        {% else %}
+                        Processed
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No business registration requests.</p>
+        {% endif %}
+    </div>
+
+
+
+    <br><br>
+
+    <!-- New Claim Requests Table -->
+    <h2 class="table-title" style="font-weight: bold;">Busineses Claim Requests</h2>
+    <table class="claim-requests-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Business Name</th>
+                <th>Phone Number</th>
+                <th>Email</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in claim_requests %}
+            <tr>
+                <td class="user-name">{{ request[2] }}</td>
+                <td>{{ request[1] }}</td>
+                <td>{{ request[3] }}</td>
+                <td>{{ request[4] }}</td>
+                <td>{{ request[5] }}</td>
+                <td>{{ request[6] }}</td>
+                <td>{{ request[7] }}</td>
+                <td>
+                    <a href="{{ url_for('review_claim', request_id=request[0]) }}">Review</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</main><!-- End #main -->
+
+{% endblock %}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>HFP Business Directory</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Business listing and promotional services" name="keywords">
+    <meta content="Business listing and promotional services" name="description">
+
+    <!-- Favicon -->
+    <link href="{{ logo_path}}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{{ url_for('static', filename='assets/lib/owlcarousel/assets/owl.carousel.min.css') }}"
+        rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css') }}"
+        rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
+
+</head>
+
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
+
+<body>
+    <!-- Your HTML content here -->
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="flash-message {{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.flash-message').forEach(function (message) {
+                message.addEventListener('click', function () {
+                    message.classList.add('fade-out');
+                    setTimeout(function () {
+                        message.remove();
+                    }, 500); // Wait for the fade-out transition to finish
+                });
+            });
+        });
+
+    </script>
+
+    <!-- Topbar Start -->
+    <div class="container-fluid bg-light pt-3 d-none d-lg-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
+                    <div class="d-inline-flex align-items-center">
+                        <p><img src="{{ logo_path }}" alt="" style="width: 60px;"> &nbsp;<i
+                                class="fa fa-envelope mr-2"></i> <a
+                                href="mailto:+2347032276597">info@dunistech.ng</a></p>
+                        <p class="text-body px-3">|</p>
+                        <p><i class="fa fa-phone-alt mr-2"></i><a href="tel:+2347032276597">+234 703 227 6597</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center text-lg-right">
+                    <div class="d-inline-flex align-items-center">
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a class="text-primary pl-3" href="">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid p-0">
+        <div class="container p-0" style="z-index: 9;">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-lg">
+                <!-- Brand -->
+                <a href="{{ url_for('index') }}" class="navbar-brand">
+                    <h1 class="m-0 text-primary"><span class="text-dark">HFP</span>Business</h1>
+                </a>
+
+                <!-- Toggler for Mobile View -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navbar Collapse -->
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <!-- Nav Items -->
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a href="{{ url_for('index') }}" class="nav-link active">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('index') }}#about" class="nav-link">About</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link" id="" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Categories <i class="fa fa-chevron-down ml-2"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                
+                                {% for category in categories %}
+                                    <a href="{{ url_for('category_view', category_id=category.id) }}" class="dropdown-item">
+                                        {{ category.name }}
+                                    </a>
+                                {% endfor %}
+                                
+                            </div>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="{{ url_for('index') }}#contact" class="nav-link">Contact</a>
+                        </li>
+                    </ul>
+
+                    
+                    {#
+                    {% if session.get('user_logged_in') %}
+                    <a href="{{ url_for('register_business') }}" class="btn btn-lg ml-3"
+                        style="background-color: #040450;color: white;">Register Business</a>
+                    {% else %}
+                    <!-- Business Owner Signin Button -->
+                    <a href="{{ url_for('register_user') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
+                        style="background-color: #040450;color: white;">Business Owner
+                        Signin</a>
+                    {% endif %}
+                    #}
+                     <!--- ma said, weather or not logged, button should still remain Register Business --
+                     <a href="{{ url_for('register_user') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
+                        style="background-color: #040450;color: white;">Create Business Account</a>-- -->
+
+                        
+
+                          <div class="btn-group">
+                            <button type="button" class="btn btn-secondary dropdown-toggle py-md-3 px-md-5 mt-2 btn-lg rounded" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              Account
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="{{ url_for('user_login') }}">Log into Account</a>
+                                <a class="dropdown-item" href="{{ url_for('register_user') }}">Register Busineses</a>
+                            </div>
+                          </div>
+                    {#
+                    {% if session.get('user_logged_in') %}
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link d-flex align-items-center" id="profileDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #212121;">
+                            <img src="../{{ session['avatar'] }}" alt="img" class="rounded-circle"
+                                style="width: 40px; height: 40px; object-fit: cover;">
+                            <span class="ml-2">{{ username }}</span> <i class="fa fa-chevron-down ml-2"></i>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="profileDropdown">
+                            <a href="{{ url_for('update_profile') }}" class="dropdown-item"><i
+                                    class="fa fa-user mr-2"></i> {{
+                                        session['username'] }} Profile</a>
+
+                            <a href="{{ url_for('user_business_profile') }}" class="dropdown-item"><i
+                                    class="fa fa-briefcase mr-2"></i>
+                                Business Profile</a>
+                            <a href="{{ url_for('register_business') }}" class="dropdown-item"><i
+                                    class="fa fa-plus-circle mr-2"></i> Register Business</a>
+                            <a href="{{ url_for('logout') }}" class="dropdown-item"><i
+                                    class="fa fa-sign-out-alt mr-2"></i>
+                                Logout</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    #}
+
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
+    {% block content %}
+
+    {% endblock %}
+
+    <div id="contact"></div>
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
+        <div class="row pt-5">
+            <div class="col-lg-4 col-md-6 mb-5">
+                <a href="" class="navbar-brand">
+                    <span class="text-white">
+                        <img src="{{ logo_path }}" width="200px" class="img-fluid" alt="">
+                </a>
+                <p>Discover how our directory has helped businesses like yours grow and succeed. Read their stories and
+                    get inspired.</p>
+                <h6 class="text-white text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Follow Us</h6>
+                <div class="d-flex justify-content-start">
+                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
+                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a class="btn btn-outline-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Our Services</h5>
+                <div class="d-flex flex-column justify-content-start">
+                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Web Design</a>
+                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Web Development</a>
+                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Graphic Design</a>
+                    <a class="text-white-50" href="#"><i class="fa fa-angle-right mr-2"></i>Blog</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-5">
+                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Contact Us</h5>
+                <p><i class="fa fa-map-marker-alt mr-2"></i>GRACELAND ESTATE, 1 Gbade Amao St, <br> Ajiwe, Lekki 3,
+                    Lagos</p>
+                <p><i class="fa fa-phone-alt mr-2"></i><a href="tel:+2347032276597">+234 703 227 6597</a></p>
+                <p><i class="fa fa-envelope mr-2"></i><a
+                        href="mailto:info@dunistech.ng">info@dunistech.ng</a> </p>
+                <h6 class="text-white text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Newsletter</h6>
+                <div class="w-100">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-light" style="padding: 25px;"
+                            placeholder="Your Email">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary px-3">Sign Up</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5"
+        style="border-color: rgba(256, 256, 256, .1) !important;">
+        <div class="row">
+            <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
+                <p class="m-0 text-white-50">Copyright &copy; <a href="#">Dunis Tech</a>. All Rights Reserved.</a>
+                </p>
+            </div>
+            <div class="col-lg-6 text-center text-md-right">
+                <p class="m-0 text-white-50">Designed by <a href="#">Dunistech Coders</a>
+                </p>
+            </div>
+        </div>
+    
+    </div>
+    <!-- Footer End -->
+
+    <!-- Back to Top Button -->
+    <a href="#" class="btn btn-primary back-to-top" id="back-to-top">
+        <i class="fas fa-arrow-up"></i> <!-- Font Awesome icon for the arrow (optional) -->
+    </a>
+
+    <!-- JavaScript Libraries -->
+    <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/easing/easing.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/owlcarousel/owl.carousel.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/tempusdominus/js/moment.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+
+    <!-- Contact Javascript File -->
+    <script src="{{ url_for('static', filename='assets/mail/jqBootstrapValidation.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/mail/contact.js') }}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+
+</body>
+
+</html>

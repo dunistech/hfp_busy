@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .card {
+        border-radius: 8px;
+        height: 100%;
+        width: inherit;
+        margin: auto;
+        /* Center card in the column */
+    }
+
+    .card-body {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .img-circle {
+        border-radius: 50%;
+        width: 100px;
+        /* Smaller image */
+        height: 100px;
+        object-fit: cover;
+    }
+
+    .social-links i {
+        font-size: 1.2rem;
+        /* Smaller icons */
+    }
+
+    .text-muted {
+        font-size: 0.85rem;
+        /* Smaller text */
+    }
+
+    .description {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0.5rem;
+        background-color: #f9f9f9;
+        min-height: 40px;
+        /* Reduced height */
+    }
+
+    .category-icon {
+        font-size: 1rem;
+        /* Smaller category icon */
+    }
+
+    .card-container {
+        height: 100%;
+    }
+
+    /* Styling the subscription form */
+    .subscription-form {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .subscription-form label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+
+    .subscription-form select,
+    .subscription-form button {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .subscription-form select {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .subscription-form button {
+        padding: 0.75rem;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .subscription-form button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<h1 class="text-center my-4">List Of Your Businesses</h1>
+{% if businesses %}
+<div class="container">
+    <div class="row">
+        {% for business in businesses %}
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="card border-light shadow-sm card-container">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        {% if business[6] and business[7] %}
+                        {% if business[6] == "image" %}
+                        <img src="{{ business[7] }}" alt="Business Image" class="img-fluid img-circle"
+                            style="border: 2px solid #ddd;">
+                        <div class="social-links mt-2">
+                            <a href="{{ url_for('edit_business_media', business_id=business[0]) }}"
+                                class="text-decoration-none me-2"> <i class="fas fa-edit"></i>Edit Media</a>
+                        </div>
+                        {% elif business[6] == 'video' %}
+                        <a href="{{ business[7] }}" class="d-block">
+                            <video class="img-fluid rounded" width="100px" height="75px" controls>
+                                <source src="../{{ business[7] }}" type="video/mp4">
+                            </video>
+                            <!-- Business Profile Section -->
+                            <div class="social-links mt-2">
+                                <a href="{{ url_for('edit_business_media', business_id=business[0]) }}"
+                                    class="text-decoration-none me-2"> <i class="fas fa-edit"></i>Edit Media</a>
+                            </div>
+                        </a>
+                        {% endif %}
+                        {% else %}
+                        <p class="text-muted">No media uploaded yet.</p>
+                        <div class="social-links mt-2">
+                            <a href="{{ url_for('edit_business_media', business_id=business[0]) }}"
+                                class="text-decoration-none me-2"> <i class="fas fa-edit"></i>Edit Media</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h2 class="h5">{{ business[1] }} (Shop No: {{ business[2] }})</h2>
+                    <div class="description my-2">
+                        <p><i class="fas fa-align-left"></i> {{ business[4] }}</p>
+                    </div>
+                    <p class="text-muted mb-1"><i class="fas fa-phone"></i> {{ business[3] }}</p>
+                    <p class="text-muted mb-1"><i class="fas fa-envelope"></i> {{ business[9] }}</p>
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-tags category-icon"></i> {{ business[8] }}
+                    </p>
+                    <p class="text-muted mb-3">
+                        <i
+                            class="fas {{ 'fa-check-circle text-success' if business[5] else 'fa-times-circle text-danger' }}"></i>
+                        {{ 'Subscribed' if business[5] else 'Not Subscribed' }}
+                    </p>
+
+                    {% if not business[5] %}
+                    <div class="subscription-form">
+                        <form action="{{ url_for('subscribe', business_id=business[0]) }}" method="POST">
+                            <label for="plan">Select Subscription Plan:</label>
+                            <select name="plan_id" id="plan" required>
+                                {% for plan in subscription_plans %}
+                                
+                                <option value="{{ plan[0] }}">
+                                    {{ plan[1] }} - ₦{{ plan[2] }}
+                                    ({{ plan[3] }} {% if plan[3] <= 1 %} Month{% else %} Months {% endif %} ) 
+                                    
+                                </option>
+                
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Subscribe</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endif %}
+
+
+
+
+
+
+{% if pending_businesses %}
+<div class="container">
+    <div>
+        <h2 style="color: #6d6d6d;">Pending Business Requests</h2>
+        <ul style="color: gray;">
+            {% for business in pending_businesses %}
+            <li>
+                <h3 style="color: gray;">{{ business[1] }} (Pending Approval)</h3>
+                <p>Shop No: {{ business[2] }}</p>
+                <p>Phone Number: {{ business[3] }}</p>
+                <p>Description: {{ business[4] }}</p>
+                <p>Request Date: {{ business[5] }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No pending business requests.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+{#
+
+<h1>Your Business Profile</h1>
+
+{% if businesses %}
+<h2>Approved Businesses</h2>
+<ul>
+    {% for business in businesses %}
+    <li>
+        {% if business[6] and business[7] %}
+        {% if business[6] == "image" %}
+        <img src="{{ business[7] }}" alt="Business Image" style="max-width: 90px; width: 100%; height: 13vh;">
+        {% elif business[6] == 'video' %}
+        <a href="{{ business[7] }}"><video width="160" height="120" controls>
+                <source src="../{{ business[7] }}" type="video/mp4">
+            </video></a>
+        {% endif %}
+        {% else %}
+        <p>No media uploaded yet.</p>
+        {% endif %}
+
+        <h3>{{ business[1] }} (Shop No: {{ business[2] }})</h3>
+        <p>Phone Number: {{ business[3] }}</p>
+        <p>Description: {{ business[4] }}</p>
+        <p>Business Category: {{ business[5] }}</p>
+        <p>Subscription Status: {{ 'Subscribed' if business[5] else 'Not Subscribed' }}</p>
+        <a href="{{ url_for('edit_business_media', business_id=business[0]) }}">Edit Media</a>
+
+        <!-- Subscription Form -->
+        {% if not business[5] %}
+        <form action="{{ url_for('subscribe', business_id=business[0]) }}" method="POST">
+            <label for="plan">Select Subscription Plan:</label>
+            <select name="plan_id" id="plan" required>
+                {% for plan in subscription_plans %}
+                                
+                <option value="{{ plan[0] }}">
+                    {{ plan[1] }} - ₦{{ plan[2] }}
+                    ({{ plan[3] }} {% if plan[3] <= 1 %} Month{% else %} Months {% endif %} ) 
+                    
+                </option>
+
+                {% endfor %}
+
+            </select>
+            <button type="submit">Subscribe</button>
+        </form>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>You have not registered any businesses yet.</p>
+{% endif %}
+
+
+<a href="{{ url_for('index') }}">Back to Home</a>
+#}
+
+
+{% endblock %}

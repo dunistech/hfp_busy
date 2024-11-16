@@ -1,0 +1,172 @@
+<!-- templates/profile.html -->
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    /* Container Alignment */
+    .container {
+        padding: 20px;
+    }
+
+    /* Card Container */
+    .card-container {
+        width: 100%;
+        /* Full width of its parent */
+        padding: 20px;
+        text-align: center;
+    }
+
+    /* Media Section */
+    .media-fixed {
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    /* Upload Media Form */
+    .upload-media-container {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        /* Full width under the image */
+    }
+
+    .upload-media-container h3 {
+        margin-bottom: 10px;
+        font-size: 1.25rem;
+        color: #333;
+    }
+
+    .upload-media-container .form-control,
+    .upload-media-container .form-control-file {
+        font-size: 0.875rem;
+        padding: 6px;
+        border-radius: 4px;
+    }
+
+    .upload-media-container .btn {
+        font-size: 0.875rem;
+        padding: 6px 12px;
+        border-radius: 4px;
+    }
+
+    /* Subscription Form */
+    .subscription-form {
+        margin-top: 20px;
+    }
+
+    .subscription-form label {
+        font-weight: 600;
+    }
+
+    .subscription-form select {
+        font-size: 0.875rem;
+        padding: 5px;
+        border-radius: 4px;
+    }
+
+    .subscription-form button {
+        padding: 8px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+    /* Center Text */
+    .text-center-container,
+    .description,
+    .subscription-form {
+        text-align: center;
+    }
+
+    .img-circle {
+        border-radius: 50%;
+        width: 100px;
+        /* Smaller image */
+        height: 100px;
+        object-fit: cover;
+    }
+</style>
+
+<div class="container">
+    <h2 style="text-align: center;">Update Your Profile</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-10 col-sm-12 mb-4">
+            <div class="card border-light shadow-sm card-container">
+                <div class="row col-12 card-body">
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                        <div class="card border-light shadow-sm card-container">
+                            <div class="card-body text-center">
+
+                                <div class="mb-3">
+                                    <img src="../{{ user[2] }}" alt="Business Image" class="img-fluid img-circle"
+                                        style="border: 2px solid #ddd;">
+                                </div>
+                                <h2 class="h5">{{ user[0] }}</h2>
+                                <p><i class="fas fa-envelope"></i> {{ user[1] }}</p>
+                            </div>
+                            
+                            <div>
+                                 <!--  -->
+                                 <a href="./user_business_profile" class="btn btn-primary btn-sm btn-block">My Businesses</a>
+                                 <a href="./logout" class="btn btn-primary btn-sm btn-block">Logout</a>
+                                 <!--  -->
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                        <!-- Business Details and Media Column -->
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <!-- Media Section -->
+                            <div class="text-center-container mb-3">
+                                <img src="../{{ user[2] }}" alt="Business Image" 
+                                class="img-fluid rounded media-fixed">
+                                
+                            </div>
+
+                            <!-- Upload Media Form -->
+                            <div class="upload-media-container mt-3">
+                                <h3><i class="fa fa-cogs mr-2"></i> Update Profile</h3>
+                                <form action="{{ url_for('update_profile') }}" method="post"
+                                    enctype="multipart/form-data">
+
+                                    <div class="pt-2">
+                                        <label for="profile_pic" class="btn btn-primary btn-sm"
+                                            title="Upload new profile image">
+                                            <i class="fas fa-upload"></i> Upload New Image
+                                            <input type="file" name="profile_image" id="profile_pic"
+                                                style="display: none;">
+                                        </label>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="username"
+                                            class="col-sm-4 col-form-label text-right">Username</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" id="username" name="username" value="{{ user[0] }}"
+                                                class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password">New Password (leave blank if not changing):</label>
+                                        <input type="password" id="password" name="password" class="form-control">
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-sm btn-block">Update</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

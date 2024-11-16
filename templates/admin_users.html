@@ -1,0 +1,92 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<main id="main" class="main">
+    <h1 class="page-title">Admin - Manage Users</h1>
+
+    <section class="">
+        <table class="user-table" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Admin</th>
+                    <th>Approved</th>
+                    <th>Suspended</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[2] }}</td>
+                    <td>{% if user[4] == False %} No {% else %} Yes {% endif %}</td>
+                    <td>{% if user[5] == True %} Yes {% else %} No {% endif %}</td>
+                    <td>{% if user[7] == False %} No {% else %} Yes {% endif %}</td>
+                    <td class="action-cell">
+                        <div class="action-dropdown" id="dropdown-{{ user[0] }}">
+                            <button class="action-btn"
+                                onclick="toggleDropdown(event, 'dropdown-{{ user[0] }}')">...</button>
+                            <div class="action-menu">
+                                <a class="menu-item" href="{{ url_for('view_user_businesses', user_id=user[0]) }}">View
+                                    Businesses</a>
+                                {% if user[7] == False %}
+                                <a class="menu-item" href="{{ url_for('suspend_user', user_id=user[0]) }}">Suspend</a>
+
+                                {% else %}
+                                <a class="menu-item"
+                                    href="{{ url_for('unsuspend_user', user_id=user[0]) }}">Unsuspend</a>
+                                {% endif %}
+                                <form action="{{ url_for('delete_user', user_id=user[0]) }}" method="post"
+                                    class="menu-item">
+                                    <button style="border: none; background-color: #fff;" type="submit"
+                                        onclick="confirmDelete(event)">Delete User</button>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    {#<a class="btn-back" href="{{ url_for('index') }}">Back to Home</a>#}
+
+    <script>
+        function confirmDelete(event) {
+            if (!confirm('Are you sure you want to delete this record?')) {
+                event.preventDefault();
+            }
+        }
+
+        function toggleDropdown(event, dropdownId) {
+            event.stopPropagation(); // Prevent click from bubbling up
+            var dropdowns = document.querySelectorAll('.action-menu');
+            dropdowns.forEach(function (menu) {
+                if (menu.parentElement.id !== dropdownId) {
+                    menu.style.display = 'none';
+                }
+            });
+
+            var dropdown = document.getElementById(dropdownId);
+            var menu = dropdown.querySelector('.action-menu');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Close dropdown if clicked outside
+        document.addEventListener('click', function (event) {
+            var openDropdowns = document.querySelectorAll('.action-menu');
+            openDropdowns.forEach(function (menu) {
+                if (!menu.contains(event.target) && !menu.previousElementSibling.contains(event.target)) {
+                    menu.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</main><!-- End #main -->
+
+{% endblock %}

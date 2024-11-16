@@ -1,0 +1,89 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<main id="main" class="main">
+
+    <h1 class="page-title">List Of Businesses Owned by User: <span style="color: red; font-weight: bold;">{{ user_name
+            }}</span>
+    </h1>
+
+    <div class=""
+        style="  margin: 0 auto; max-width: 1200px; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow-x: auto;">
+        <table class="business-table">
+            <thead>
+                <tr>
+                    <th>Business Name</th>
+                    <th>Shop No</th>
+                    <th>Phone Number</th>
+                    <th>Description</th>
+                    <th>Email</th>
+                    <th>Subscribed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for business in businesses %}
+                <tr>
+                    <td>{{ business[1] }}</td>
+                    <td>{{ business[2] }}</td>
+                    <td>{{ business[3] }}</td>
+                    <td>{{ business[4] }}</td>
+                    <td>{{ business[6] }}</td>
+                    <td>{{ 'Yes' if business[5] else 'No' }}</td>
+                    <td class="action-cell">
+                        <div class="action-dropdown" id="dropdown-{{ business[0] }}">
+                            <button class="action-btn"
+                                onclick="toggleDropdown(event, 'dropdown-{{ business[0] }}')">...</button>
+                            <div class="action-menu">
+                                <a class="menu-item"
+                                    href="{{ url_for('update_business', business_id=business[0]) }}">Update</a>
+                                <form action="{{ url_for('delete_business', business_id=business[0]) }}" method="post"
+                                    class="menu-item">
+                                    <button style="border: none; background-color: #fff;" class="menu-item-delete"
+                                        type="submit" onclick="confirmDelete(event)">Delete Business</button>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a class="btn-back" href="{{ url_for('admin_users') }}">Back to User Management</a>
+
+    <script>
+        function confirmDelete(event) {
+            if (!confirm('Are you sure you want to delete this business?')) {
+                event.preventDefault();
+            }
+        }
+
+        function toggleDropdown(event, dropdownId) {
+            event.stopPropagation(); // Prevent click from bubbling up
+            var dropdowns = document.querySelectorAll('.action-menu');
+            dropdowns.forEach(function (menu) {
+                if (menu.parentElement.id !== dropdownId) {
+                    menu.style.display = 'none';
+                }
+            });
+
+            var dropdown = document.getElementById(dropdownId);
+            var menu = dropdown.querySelector('.action-menu');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Close dropdown if clicked outside
+        document.addEventListener('click', function (event) {
+            var openDropdowns = document.querySelectorAll('.action-menu');
+            openDropdowns.forEach(function (menu) {
+                if (!menu.contains(event.target) && !menu.previousElementSibling.contains(event.target)) {
+                    menu.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</main><!-- End #main -->
+
+{% endblock %}

@@ -4,10 +4,10 @@ def get_db_connection():
     try:
         # Fetching connection parameters from environment variables
         conn = mysql.connector.connect(
-            host=os.getenv('DB_HOST', 'localhost'),  # Default is 'localhost'
-            database=os.getenv('DB_NAME', 'hfp_db'),  # Default database name
+            host=os.getenv('DB_HOST', 'localhost'),  
+            database=os.getenv('DB_NAME', 'hfp_data'),  
             user=os.getenv('DB_USER', 'root'),  # Default MySQL username
-            password=os.getenv('DB_PASSWORD', '')  # Default MySQL password
+            password=os.getenv('DB_PASSWORD', 'password')  # Default MySQL password
         )
         if conn.is_connected():
             print("Successfully connected to MySQL database!")
@@ -142,6 +142,7 @@ def create_tables():
                     category VARCHAR(50) NOT NULL,
                     block_num VARCHAR(50),
                     email VARCHAR(100),
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
                 );
             """)

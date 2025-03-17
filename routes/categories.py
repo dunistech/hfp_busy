@@ -41,7 +41,7 @@ def category_view(category_id):
         cur.close()
     except Exception as e:
         flash(f"Database error: {e}", 'error')
-        businesses = []  # Ensure businesses is an empty list on error
+        businesses = []  # Ensure businesses is an empty list on error.
     finally:
         conn.close()
 

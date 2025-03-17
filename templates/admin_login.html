@@ -75,7 +75,7 @@
                                         <p class="text-center small">Enter your username & password to login</p>
                                     </div>
 
-                                    <form class="row g-3 needs-validation" action="{{ url_for('admin_login') }}"
+                                    <form class="row g-3 needs-validation" action="{{ url_for('admin.admin_login') }}"
                                         method="POST">
 
                                         <div class="col-12">
@@ -107,8 +107,8 @@
                                         </div>
                                         <div class="col-12">
                                             <p class="small mb-0">Don't have account? <a
-                                                    href="{{ url_for('register_user') }}">Create an account</a> or
-                                                <a href="{{ url_for('forgot_password') }}">forgotton password</a>
+                                                    href="{{ url_for('auth.register_user') }}">Create an account</a> or
+                                                <a href="{{ url_for('auth.forgot_password') }}">forgotton password</a>
                                             </p>
                                         </div>
                                     </form>

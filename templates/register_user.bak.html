@@ -87,7 +87,7 @@
                                         <p class="text-center small">Enter your personal details to create account</p>
                                     </div>
 
-                                    <form action="{{ url_for('register_user') }}" method="POST"
+                                    <form action="{{ url_for('auth.register_user') }}" method="POST"
                                         class="row g-3 needs-validation" novalidate>
                                         <div class="col-12">
                                             <label for="yourUsername" class="form-label">Name</label>
@@ -141,12 +141,12 @@
                                         </div>
                                         <div class="col-12">
                                             <p class="small mb-0">Already have an account? <a
-                                                    href="{{ url_for('user_login') }}">Login</a> or
-                                                <a href="{{ url_for('forgot_password') }}">forgotton password</a>
+                                                    href="{{ url_for('auth.user_login') }}">Login</a> or
+                                                <a href="{{ url_for('auth.forgot_password') }}">forgotton password</a>
                                             </p>
                                         </div>
                                     </form><br>
-                                    <p style="text-align: center;"><a href="{{ url_for('index') }}">Back to Home</a></p>
+                                    <p style="text-align: center;"><a href="{{ url_for('index.home') }}">Back to Home</a></p>
 
                                 </div>
                             </div>

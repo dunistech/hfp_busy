@@ -76,13 +76,13 @@
                                 <a href="index.html" class="logo d-flex align-items-center w-auto">
                                     <img src="assets/img/logo.png" alt="">
                                     <span class="d-lg-block">Account/Business Registration| 
-                                        <a href="{{ url_for('index') }}">Back to Home</a> </span>
+                                        <a href="{{ url_for('index.home') }}">Back to Home</a> </span>
                                 </a>
                             </div><!-- End Logo -->
                             <!-- --- ---->
                             <div class="card-body">
                                 <div class="new-user-info">
-                                    <form action="{{ url_for('register_business') }}" method="POST" class="row g-3 needs-validation" novalidate>
+                                    <form action="{{ url_for('auth.register_business') }}" method="POST" class="row g-3 needs-validation" novalidate>
                                         <div class="row">
                                             <div class="form-group col-md-6">
                                                 <label for="name">Phone</label>
@@ -101,7 +101,7 @@
                                         <div class="row">
                                             <div class="form-group col-md-6">
                                                 <label for="name">Website Url</label>
-                                                <input class="form-control" id="website_url" maxlength="20" minlength="2"
+                                                <input class="form-control" id="website_url" 
                                                     name="website_url" placeholder="Your website Link Here" required="" type="text">
 
                                             </div>
@@ -168,8 +168,8 @@
 
                                 <div class="col-12">
                                     <p class="small mb-0">Already have an account? <a
-                                            href="{{ url_for('user_login') }}">Login</a> or
-                                        <a href="{{ url_for('forgot_password') }}">forgotton password</a>
+                                            href="{{ url_for('auth.user_login') }}">Login</a> or
+                                        <a href="{{ url_for('auth.forgot_password') }}">forgotton password</a>
                                     </p>
                                 </div>
 

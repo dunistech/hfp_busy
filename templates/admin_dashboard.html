@@ -48,7 +48,7 @@
                         <td>{{ request[3] }}</td>
                         <td>
                             {% if not request[5] %}
-                            <form action="{{ url_for('process_user_registration') }}" method="POST">
+                            <form action="{{ url_for('admin.process_user_registration') }}" method="POST">
                                 <input type="hidden" name="username" value="{{ request[1] }}">
                                 <input type="hidden" name="email" value="{{ request[3] }}">
                                 <input type="hidden" name="password" value="{{ request[2] }}">
@@ -98,7 +98,7 @@
                         </td>
                         <td>
                             {% if not user[5] %}
-                            <form action="{{ url_for('approve_user') }}" method="POST" onsubmit="showLoading(this);">
+                            <form action="{{ url_for('admin.approve_user') }}" method="POST" onsubmit="showLoading(this);">
                                 <input type="hidden" name="username" value="{{ user[1] }}">
                                 <button type="submit">Approve</button>
                             </form>
@@ -149,7 +149,7 @@
                     <td>{{ request[10] }}</td>
                     <td>
                         {% if not request[5] %}
-                        <form action="{{ url_for('process_business_registration') }}" method="POST">
+                        <form action="{{ url_for('business.process_business_registration') }}" method="POST">
                             <input type="hidden" name="user_id" value="{{ request[7] }}">
                             <input type="hidden" name="business_name" value="{{ request[1] }}">
                             <input type="hidden" name="shop_no" value="{{ request[2] }}">
@@ -203,7 +203,7 @@
                 <td>{{ request[6] }}</td>
                 <td>{{ request[7] }}</td>
                 <td>
-                    <a href="{{ url_for('review_claim', request_id=request[0]) }}">Review</a>
+                    <a href="{{ url_for('business.review_claim', request_id=request[0]) }}">Review</a>
                 </td>
             </tr>
             {% endfor %}

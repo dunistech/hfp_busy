@@ -36,8 +36,8 @@
                                 onclick="toggleDropdown(event, 'dropdown-{{ business[0] }}')">...</button>
                             <div class="action-menu">
                                 <a class="menu-item"
-                                    href="{{ url_for('update_business', business_id=business[0]) }}">Update</a>
-                                <form action="{{ url_for('delete_business', business_id=business[0]) }}" method="post"
+                                    href="{{ url_for('admin.update_business', business_id=business[0]) }}">Update</a>
+                                <form action="{{ url_for('admin.delete_business', business_id=business[0]) }}" method="post"
                                     class="menu-item">
                                     <button style="border: none; background-color: #fff;" class="menu-item-delete"
                                         type="submit" onclick="confirmDelete(event)">Delete Business</button>
@@ -51,7 +51,7 @@
         </table>
     </div>
 
-    <a class="btn-back" href="{{ url_for('admin_users') }}">Back to User Management</a>
+    <a class="btn-back" href="{{ url_for('admin.admin_users') }}">Back to User Management</a>
 
     <script>
         function confirmDelete(event) {

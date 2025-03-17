@@ -110,7 +110,7 @@
                         <img src="{{ business[7] }}" alt="Business Image" class="img-fluid img-circle"
                             style="border: 2px solid #ddd;">
                         <div class="social-links mt-2">
-                            <a href="{{ url_for('edit_business_media', business_id=business[0]) }}"
+                            <a href="{{ url_for('user.edit_business_media', business_id=business[0]) }}"
                                 class="text-decoration-none me-2"> <i class="fas fa-edit"></i>Edit Media</a>
                         </div>
                         {% elif business[6] == 'video' %}
@@ -120,7 +120,7 @@
                             </video>
                             <!-- Business Profile Section -->
                             <div class="social-links mt-2">
-                                <a href="{{ url_for('edit_business_media', business_id=business[0]) }}"
+                                <a href="{{ url_for('user.edit_business_media', business_id=business[0]) }}"
                                     class="text-decoration-none me-2"> <i class="fas fa-edit"></i>Edit Media</a>
                             </div>
                         </a>
@@ -128,7 +128,7 @@
                         {% else %}
                         <p class="text-muted">No media uploaded yet.</p>
                         <div class="social-links mt-2">
-                            <a href="{{ url_for('edit_business_media', business_id=business[0]) }}"
+                            <a href="{{ url_for('user.edit_business_media', business_id=business[0]) }}"
                                 class="text-decoration-none me-2"> <i class="fas fa-edit"></i>Edit Media</a>
                         </div>
                         {% endif %}
@@ -236,7 +236,7 @@
         <p>Description: {{ business[4] }}</p>
         <p>Business Category: {{ business[5] }}</p>
         <p>Subscription Status: {{ 'Subscribed' if business[5] else 'Not Subscribed' }}</p>
-        <a href="{{ url_for('edit_business_media', business_id=business[0]) }}">Edit Media</a>
+        <a href="{{ url_for('user.edit_business_media', business_id=business[0]) }}">Edit Media</a>
 
         <!-- Subscription Form -->
         {% if not business[5] %}
@@ -265,7 +265,7 @@
 {% endif %}
 
 
-<a href="{{ url_for('index') }}">Back to Home</a>
+<a href="{{ url_for('index.home') }}">Back to Home</a>
 #}
 
 

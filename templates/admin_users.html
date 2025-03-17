@@ -31,16 +31,16 @@
                             <button class="action-btn"
                                 onclick="toggleDropdown(event, 'dropdown-{{ user[0] }}')">...</button>
                             <div class="action-menu">
-                                <a class="menu-item" href="{{ url_for('view_user_businesses', user_id=user[0]) }}">View
+                                <a class="menu-item" href="{{ url_for('admin.view_user_businesses', user_id=user[0]) }}">View
                                     Businesses</a>
                                 {% if user[7] == False %}
-                                <a class="menu-item" href="{{ url_for('suspend_user', user_id=user[0]) }}">Suspend</a>
+                                <a class="menu-item" href="{{ url_for('admin.suspend_user', user_id=user[0]) }}">Suspend</a>
 
                                 {% else %}
                                 <a class="menu-item"
-                                    href="{{ url_for('unsuspend_user', user_id=user[0]) }}">Unsuspend</a>
+                                    href="{{ url_for('admin.unsuspend_user', user_id=user[0]) }}">Unsuspend</a>
                                 {% endif %}
-                                <form action="{{ url_for('delete_user', user_id=user[0]) }}" method="post"
+                                <form action="{{ url_for('admin.delete_user', user_id=user[0]) }}" method="post"
                                     class="menu-item">
                                     <button style="border: none; background-color: #fff;" type="submit"
                                         onclick="confirmDelete(event)">Delete User</button>
@@ -54,7 +54,7 @@
         </table>
     </section>
 
-    {#<a class="btn-back" href="{{ url_for('index') }}">Back to Home</a>#}
+    {#<a class="btn-back" href="{{ url_for('index.home') }}">Back to Home</a>#}
 
     <script>
         function confirmDelete(event) {

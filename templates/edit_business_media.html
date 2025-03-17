@@ -182,7 +182,7 @@
                                 <b class="text-danger m-4">Note: Only Subscribed Busineses Can Display/Change Their Media/Ads. </b>
                                 
                                 <h3><i class="fas fa-upload"></i> Upload Media</h3>
-                                <form action="{{ url_for('edit_business_media', business_id=business[0]) }}"
+                                <form action="{{ url_for('user.edit_business_media', business_id=business[0]) }}"
                                     method="POST" enctype="multipart/form-data">
                                     <div class="form-group">
                                         <label for="media_type">Media Type:</label>

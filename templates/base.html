@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>HFP Business Directory</title>
+    <title>BUSINESSES IN AJAH HFP EASTLINE SHOPPING COMPLEX ABRAHAM ADESANYA TRAFFIC LIGHT</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Business listing and promotional services" name="keywords">
     <meta content="Business listing and promotional services" name="description">
@@ -106,7 +106,7 @@
         <div class="container p-0" style="z-index: 9;">
             <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-lg">
                 <!-- Brand -->
-                <a href="{{ url_for('index') }}" class="navbar-brand">
+                <a href="{{ url_for('index.home') }}" class="navbar-brand">
                     <h1 class="m-0 text-primary"><span class="text-dark">HFP</span>Business</h1>
                 </a>
 
@@ -120,10 +120,10 @@
                     <!-- Nav Items -->
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
-                            <a href="{{ url_for('index') }}" class="nav-link active">Home</a>
+                            <a href="{{ url_for('index.home') }}" class="nav-link active">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url_for('index') }}#about" class="nav-link">About</a>
+                            <a href="{{ url_for('index.home') }}#about" class="nav-link">About</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a href="#" class="nav-link" id="" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -132,7 +132,7 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 
                                 {% for category in categories %}
-                                    <a href="{{ url_for('category_view', category_id=category.id) }}" class="dropdown-item">
+                                    <a href="{{ url_for('categories.category_view', category_id=category.id) }}" class="dropdown-item">
                                         {{ category.name }}
                                     </a>
                                 {% endfor %}
@@ -141,24 +141,24 @@
                         </li>
                         
                         <li class="nav-item">
-                            <a href="{{ url_for('index') }}#contact" class="nav-link">Contact</a>
+                            <a href="{{ url_for('index.home') }}#contact" class="nav-link">Contact</a>
                         </li>
                     </ul>
 
                     
                     {#
                     {% if session.get('user_logged_in') %}
-                    <a href="{{ url_for('register_business') }}" class="btn btn-lg ml-3"
+                    <a href="{{ url_for('auth.register_business') }}" class="btn btn-lg ml-3"
                         style="background-color: #040450;color: white;">Register Business</a>
                     {% else %}
                     <!-- Business Owner Signin Button -->
-                    <a href="{{ url_for('register_user') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
+                    <a href="{{ url_for('auth.register_user') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
                         style="background-color: #040450;color: white;">Business Owner
                         Signin</a>
                     {% endif %}
                     #}
                      <!--- ma said, weather or not logged, button should still remain Register Business --
-                     <a href="{{ url_for('register_user') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
+                     <a href="{{ url_for('auth.register_user') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
                         style="background-color: #040450;color: white;">Create Business Account</a>-- -->
 
                         
@@ -168,8 +168,8 @@
                               Account
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ url_for('user_login') }}">Log into Account</a>
-                                <a class="dropdown-item" href="{{ url_for('register_user') }}">Register Busineses</a>
+                                <a class="dropdown-item" href="{{ url_for('auth.user_login') }}">Log into Account</a>
+                                <a class="dropdown-item" href="{{ url_for('auth.register_user') }}">Register Busineses</a>
                             </div>
                           </div>
                     {#
@@ -182,16 +182,16 @@
                             <span class="ml-2">{{ username }}</span> <i class="fa fa-chevron-down ml-2"></i>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="profileDropdown">
-                            <a href="{{ url_for('update_profile') }}" class="dropdown-item"><i
+                            <a href="{{ url_for('user.update_profile') }}" class="dropdown-item"><i
                                     class="fa fa-user mr-2"></i> {{
                                         session['username'] }} Profile</a>
 
                             <a href="{{ url_for('user_business_profile') }}" class="dropdown-item"><i
                                     class="fa fa-briefcase mr-2"></i>
                                 Business Profile</a>
-                            <a href="{{ url_for('register_business') }}" class="dropdown-item"><i
+                            <a href="{{ url_for('auth.register_business') }}" class="dropdown-item"><i
                                     class="fa fa-plus-circle mr-2"></i> Register Business</a>
-                            <a href="{{ url_for('logout') }}" class="dropdown-item"><i
+                            <a href="{{ url_for('auth.logout') }}" class="dropdown-item"><i
                                     class="fa fa-sign-out-alt mr-2"></i>
                                 Logout</a>
                         </div>
@@ -209,68 +209,154 @@
     {% endblock %}
 
     <div id="contact"></div>
-    <!-- Footer Start -->
-    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
-        <div class="row pt-5">
-            <div class="col-lg-4 col-md-6 mb-5">
-                <a href="" class="navbar-brand">
-                    <span class="text-white">
-                        <img src="{{ logo_path }}" width="200px" class="img-fluid" alt="">
-                </a>
-                <p>Discover how our directory has helped businesses like yours grow and succeed. Read their stories and
-                    get inspired.</p>
-                <h6 class="text-white text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Follow Us</h6>
-                <div class="d-flex justify-content-start">
-                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
-                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a class="btn btn-outline-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
+<!-- Footer Start --
+<div class="container-fluid bg-light text-dark py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
+    <div class="row pt-5">
+        <div class="col-lg-4 col-md-6 mb-5">
+            <a href="#" class="navbar-brand">
+                <span class="text-dark">
+                    <img src="{{ logo_path }}" width="200px" class="img-fluid" alt="Dunis Tech Logo">
+                </span>
+            </a>
+            <p>Dunis Technologies Limited is a global tech company that builds innovative software, grooms tech experts via professional training and mentorship, and renders computer sales and services. For more, please visit <a href="https://dunistech.ng" target="_blank">dunistech.ng</a>.</p>
+            <h6 class="text-dark text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Follow Us</h6>
+            <div class="d-flex justify-content-start">
+                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
+                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a class="btn btn-outline-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-5">
+            <h5 class="text-dark text-uppercase mb-4" style="letter-spacing: 5px;">Our Services</h5>
+            <div class="d-flex flex-column justify-content-start">
+                <a class="text-dark mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Software Development</a>
+                <a class="text-dark mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Web Design, Hosting & Maintenance</a>
+                <a class="text-dark mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Coding & Computer Training School</a>
+                <a class="text-dark" href="#"><i class="fa fa-angle-right mr-2"></i>Computer & Accessories Sales</a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-5">
+            <h5 class="text-dark text-uppercase mb-4" style="letter-spacing: 5px;">Contact Us</h5>
+            <div class="col">
+                
+            <p><i class="fa fa-map-marker-alt mr-2"></i>GRACELAND ESTATE, 1 Gbade Amao St, <br> Ajiwe, Lekki 3, Lagos</p> 
+            <p><i class="fa fa-phone-alt mr-2"></i>
+                <a href="tel:+234 704 394 4279">+234 704 394 4279</a> |
+                <a href="tel:07032276597">07032276597</a>
+            </p>
+            </div>
+            <hr>
+            <div class="col">
+            <p><i class="fa fa-map-marker-alt mr-2"></i>HFP EASTLINE SHOPPING COMPLEX, ABRAHAM ADESANYA TRAFFIC LIGHT
+                 <br>BLOCK F4, SHOPE 39 & 40.</p> 
+            <p><i class="fa fa-phone-alt mr-2"></i>
+                <a href="tel:+234 812 247 7213">+234 812 247 7213</a> |
+                <a href="tel:07032276597">07032276597</a>
+            </p>
+            </div>
+
+            <hr>
+            
+            <p><i class="fa fa-envelope mr-2"></i><a href="mailto:info@dunistech.ng">info@dunistech.ng</a></p>
+            <h6 class="text-dark text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">JOIN OUR MAILING LIST</h6>
+            <p>To get training, events, and product updates</p>
+            <div class="w-100">
+                <div class="input-group">
+                    <input type="text" class="form-control rounded" style="padding: 25px;" placeholder="Type or paste your email here">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary px-3 rounded btn-lg">SUBMIT</button>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 mb-5">
-                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Our Services</h5>
-                <div class="d-flex flex-column justify-content-start">
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Web Design</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Web Development</a>
-                    <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Graphic Design</a>
-                    <a class="text-white-50" href="#"><i class="fa fa-angle-right mr-2"></i>Blog</a>
-                </div>
+
+        </div>
+    </div>
+</div>
+<div class="container-fluid bg-light text-dark border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(0, 0, 0, .1) !important;">
+    <div class="row">
+        <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
+            <p class="m-0 text-dark">Copyright &copy; <a href="#">Dunis Tech</a>. All Rights Reserved.</p>
+        </div>
+        <div class="col-lg-6 text-center text-md-right">
+            <p class="m-0 text-dark">Designed by <a href="#">Dunistech Coders</a></p>
+        </div>
+    </div>
+</div>
+<!-- Footer End -->
+
+<!-- Footer Start -->
+<div class="container-fluid bg-light text-dark py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
+    <div class="row pt-5">
+        <div class="col-lg-6 col-md-6 mb-5">
+            <a href="#" class="navbar-brand">
+                <span class="text-dark">
+                    <img src="{{ logo_path }}" width="200px" class="img-fluid" alt="Dunis Tech Logo">
+                </span>
+            </a>
+            <p class="footer-description">Dunis Technologies Limited is a global tech company that builds innovative software, grooms tech experts via professional training and mentorship, and renders computer sales and services. For more, please visit <a href="https://dunistech.ng" target="_blank">dunistech.ng</a>.</p>
+            <h6 class="text-dark text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Follow Us</h6>
+            <div class="d-flex justify-content-start">
+                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
+                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a class="btn btn-outline-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
             </div>
-            <div class="col-lg-4 col-md-6 mb-5">
-                <h5 class="text-white text-uppercase mb-4" style="letter-spacing: 5px;">Contact Us</h5>
-                <p><i class="fa fa-map-marker-alt mr-2"></i>GRACELAND ESTATE, 1 Gbade Amao St, <br> Ajiwe, Lekki 3,
-                    Lagos</p>
-                <p><i class="fa fa-phone-alt mr-2"></i><a href="tel:+2347032276597">+234 703 227 6597</a></p>
-                <p><i class="fa fa-envelope mr-2"></i><a
-                        href="mailto:info@dunistech.ng">info@dunistech.ng</a> </p>
-                <h6 class="text-white text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Newsletter</h6>
-                <div class="w-100">
-                    <div class="input-group">
-                        <input type="text" class="form-control border-light" style="padding: 25px;"
-                            placeholder="Your Email">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary px-3">Sign Up</button>
-                        </div>
+            <h5 class="text-dark text-uppercase mb-4 mt-4" style="letter-spacing: 5px;">Our Services</h5>
+            <div class="d-flex flex-column justify-content-start">
+                <a class="text-dark mb-2" href="http://dunistech.ng/services"><i class="fa fa-angle-right mr-2"></i>Software Development</a>
+                <a class="text-dark mb-2" href="http://dunistech.ng/services"><i class="fa fa-angle-right mr-2"></i>Web Design, Hosting & Maintenance</a>
+                <a class="text-dark mb-2" href="http://dunistech.ng/services"><i class="fa fa-angle-right mr-2"></i>Coding & Computer Training School</a>
+                <a class="text-dark" href="http://dunistech.ng/services"><i class="fa fa-angle-right mr-2"></i>Computer & Accessories Sales</a>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 mb-5">
+            <h5 class="text-dark text-uppercase mb-4" style="letter-spacing: 5px;">Contact Us</h5>
+            <p><i class="fa fa-map-marker-alt mr-2"></i>GRACELAND ESTATE, 1 Gbade Amao St, <br> Ajiwe, Lekki 3, Lagos</p> 
+            <p><i class="fa fa-phone-alt mr-2"></i>
+                <a href="tel:+2347043944279">+234 704 394 4279</a> |
+                <a href="tel:07032276597">07032276597</a>
+            </p>
+            <hr>
+            <p><i class="fa fa-map-marker-alt mr-2"></i>HFP EASTLINE SHOPPING COMPLEX, ABRAHAM ADESANYA TRAFFIC LIGHT
+                 <br>BLOCK F4, SHOP 39 & 40.</p> 
+            <p><i class="fa fa-phone-alt mr-2"></i>
+                <a href="tel:+2348122477213">+234 812 247 7213</a> |
+                <a href="tel:07032276597">07032276597</a>
+            </p>
+            <hr>
+            <p><i class="fa fa-envelope mr-2"></i><a href="mailto:info@dunistech.ng">info@dunistech.ng</a></p>
+            <h6 class="text-dark text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">JOIN OUR MAILING LIST</h6>
+            <p>To get training, events, and product updates</p>
+            <div class="w-100">
+                <div class="input-group">
+                    <input type="text" class="form-control rounded" style="padding: 25px;" placeholder="Type or paste your email here">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary px-3 rounded btn-lg">SUBMIT</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5"
-        style="border-color: rgba(256, 256, 256, .1) !important;">
-        <div class="row">
-            <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
-                <p class="m-0 text-white-50">Copyright &copy; <a href="#">Dunis Tech</a>. All Rights Reserved.</a>
-                </p>
-            </div>
-            <div class="col-lg-6 text-center text-md-right">
-                <p class="m-0 text-white-50">Designed by <a href="#">Dunistech Coders</a>
-                </p>
-            </div>
+</div>
+<div class="container-fluid bg-light text-dark border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(0, 0, 0, .1) !important;">
+    <div class="row">
+        <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
+            <p class="m-0 text-dark">Copyright &copy; <a href="http://dunistech.ng">Dunis Tech</a>. All Rights Reserved.</p>
         </div>
-    
+        <div class="col-lg-6 text-center text-md-right">
+            <p class="m-0 text-dark">Designed by <a href="http://dunistech.ng/academy">The Dunistech Software Engineering Dept.</a></p>
+        </div>
     </div>
-    <!-- Footer End -->
+</div>
+<!-- Footer End -->
+<style>
+    .footer-description {
+        max-width: 500px; /* Adjust the width as needed */
+        line-height: 1.5; /* Improve readability */
+    }
+    
+</style>
 
     <!-- Back to Top Button -->
     <a href="#" class="btn btn-primary back-to-top" id="back-to-top">

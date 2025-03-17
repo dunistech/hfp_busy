@@ -75,120 +75,95 @@
                                 <a href="index.html" class="logo d-flex align-items-center w-auto">
                                     <img src="assets/img/logo.png" alt="">
                                     <span class="d-none d-lg-block">Account/Business Registrations 
-                                        <a class="h4" href="{{ url_for('index') }}">Back to Home</a> </span>
+                                        <a class="h4" href="{{ url_for('index.home') }}">Back to Home</a> </span>
                                 </a>
                             </div><!-- End Logo -->
                             <!-- --- ---->
                             <div class="card-body">
                                 <div class="new-user-info">
-                                    <form action="{{ url_for('register_user') }}" method="POST"
-                                        class="row g-3 needs-validation" novalidate>
+                                    <form action="{{ url_for('auth.register_user') }}" method="POST" class="row g-3 needs-validation" novalidate>
                                         <div class="row">
                                             <div class="form-group col-md-6">
-                                                <label for="name">Phone</label>
-                                                <input class="form-control" id="phone" maxlength="20" minlength="2"
-                                                    name="phone" placeholder="phone" required="" type="tel">
-
+                                                <label for="phone">Phone</label>
+                                                <input class="form-control" id="phone" maxlength="20" minlength="2" name="phone" placeholder="phone" required type="tel" value="{{ phone }}">
                                             </div>
-
+                                    
                                             <div class="form-group col-md-6">
                                                 <label for="email">Email:</label>
-                                                <input type="email" class="form-control" name="email" id="email"
-                                                    placeholder="email addres">
+                                                <input type="email" class="form-control" name="email" id="email" placeholder="email address" value="{{ email }}">
                                             </div>
                                         </div>
-
+                                    
                                         <div class="row">
                                             <div class="form-group col-md-6">
-                                                <label for="name">Website Url</label>
-                                                <input class="form-control" id="phone" maxlength="20" minlength="2"
-                                                    name="website_url" placeholder="Your website Link Here" required="" type="text">
-
+                                                <label for="website_url">Website Url</label>
+                                                <input class="form-control" id="website_url" name="website_url" placeholder="Your website Link Here" required type="text" value="{{ website_url }}">
                                             </div>
-
+                                    
                                             <div class="form-group col-md-6">
                                                 <label for="social_handles">Social Handle:</label>
-                                                <input type="text" class="form-control" name="social_handles" id="social_handles"
-                                                    placeholder="Your Social Mdeia Handle">
+                                                <input type="text" class="form-control" name="social_handles" id="social_handles" placeholder="Your Social Media Handle" value="{{ social_handles }}">
                                             </div>
                                         </div>
+                                    
+                                        <div class="form-group col-md-12 col-sm-12">
+                                            <label for="description">Description:</label>
+                                            <textarea class="form-control" id="description" name="description" placeholder="description" rows="2">{{ description }}</textarea>
+                                        </div>
+                                    
+                                        <div class="form-group col-md-12">
+                                            <label for="name">Business Name:</label>
+                                            <input class="form-control" id="name" name="name" placeholder="Enter Your name" type="text" value="{{ name }}">
+                                        </div>
+                                    
+                                        <hr>
+                                        <div class="row">
+                                            <div class="form-group col-md-4">
+                                                <label for="shop_no">Shop Number:</label>
+                                                <input class="form-control" id="shop_no" name="shop_no" placeholder="Shop no" type="number" value="{{ shop_no }}">
+                                            </div>
+                                    
+                                            <div class="form-group col-md-4">
+                                                <label for="block_num">Block Number:</label>
+                                                <input class="form-control" id="block_num" name="block_num" placeholder="block no" type="text" value="{{ block_num }}">
+                                            </div>
+                                    
+                                            <div class="form-group col-md-4">
+                                                <label for="category">Select Category:</label>
+                                                <select class="form-control" id="category" name="category">
+                                                    {% for category in categories %}
+                                                    <option value="{{ category.name }}" {% if category.name == category %}selected{% endif %}>{{ category.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    
+                                        <hr>
+                                        <div class="row">
+                                            <div class="form-group col-md-6">
+                                                <label for="username">Username:</label>
+                                                <input class="form-control" id="username" placeholder="username" maxlength="20" minlength="2" name="username" required type="text" value="{{ username }}">
+                                            </div>
+                                    
+                                            <div class="form-group col-md-6">
+                                                <label for="password">Password:</label>
+                                                <input class="form-control" id="password" name="password" placeholder="Password" type="password">
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="checkbox">
+                                            <label><input class="mr-2" checked type="checkbox">Agree to Dunis terms &amp; conditions</label>
+                                        </div>
                                         
-                                            <div class="form-group col-md-12 col-sm-12">
-                                                <label>description:</label>
-
-                                                <textarea class="form-control" id="description" name="description"
-                                                    placeholder="description" rows="2"></textarea>
-
-                                            </div>
-
-                                            <div class="form-group col-md-12">
-                                                <label for="name">Business Name:</label>
-                                                <input class="form-control" id="name" name="name"
-                                                    placeholder="Enter Your name" type="text">
-
-                                            </div>
-
-                                </div>
-
-                                <hr>
-                                <div class="row">
-
-                                    <div class="form-group col-md-4">
-                                        <label for="shop_no">Shop Numbr:</label>
-                                        <input class="form-control" id="shop_no" name="shop_no" placeholder="Shop no"
-                                            type="number">
-
-                                    </div>
-
-                                    <div class="form-group col-md-4">
-                                        <label for="block_num">Block Number:</label>
-                                        <input class="form-control" id="block_num" name="block_num"
-                                            placeholder="block no" type="text">
-
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="category">Select Category:</label>
-
-                                        <select class="form-control" id="category" name="category"
-                                            placeholder="category">
-                                            {% for category in categories %}
-                                            <option value="{{category.name}}">{{category.name}}</option>
-                                            {% endfor %}
-                                        </select>
-
-                                    </div>
-                                </div>
-
-                                <hr>
-                                <div class="row">
-                                    <div class="form-group col-md-6">
-                                        <label for="username">Username:</label>
-                                        <input class="form-control" id="username" placeholder="username" maxlength="20"
-                                            minlength="2" name="username" required="" type="text">
-
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="password">Password:</label>
-
-                                        <input class="form-control" id="password" name="password" placeholder="Password"
-                                            type="password">
-
-                                    </div>
-                                </div>
-                                <div class="checkbox">
-                                    <label><input class="mr-2" checked="" type="checkbox">Agree to Dunis terms &amp;
-                                        conditions</label>
-                                </div>
-                                <div id="response" class="alert"></div>
-                                <input class="btn btn-primary btn-lg" id="submit" name="submit" type="submit"
-                                    value="Submit Registrations">
-
-                                </form>
+                                        <div id="response" class="alert"></div>
+                                        
+                                        <button class="btn btn-primary btn-lg" id="submit" name="submit" type="submit">Register</button>
+                                    </form>
 
                                 <div class="col-12">
                                     <p class="small mb-0">Already have an account? <a
-                                            href="{{ url_for('user_login') }}">Login</a> or
-                                        <a href="{{ url_for('forgot_password') }}">forgotton password</a>
+                                            href="{{ url_for('auth.user_login') }}">Login</a> or
+                                        <a href="{{ url_for('auth.forgot_password') }}">forgotton password</a>
                                     </p>
                                 </div>
 

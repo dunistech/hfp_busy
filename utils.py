@@ -1,3 +1,31 @@
+from flask import url_for
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
+import mysql.connector
+from werkzeug.utils import secure_filename
+
+from dotenv import load_dotenv
+# Load environment variables from .env file
+load_dotenv()
+
+from config import Config as config
+# allowed_extensions = config.ALLOWED_EXTENSIONS
+# print(dir(config.Config))
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS
+
+# UPLOAD Images and Videos Function
+def upload_file(file):
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(config.UPLOAD_FOLDER, filename)
+        file.save(file_path)
+        return filename  
+    return None
+
+# 
 import mysql.connector, os
 # Function to establish a direct MySQL connection
 def get_db_connection():
@@ -275,12 +303,34 @@ def create_tables():
         print("Could not open connection to the database")
 
 # Call the function to initialize the database
-create_tables()
+# create_tables()
 
+serializer = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
 
+# 
+## Forgotton password Route and Functions ##
+def generate_reset_token(user_id):
+    # serializer = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
+    return serializer.dumps(user_id, salt='password-reset-salt')
 
+def verify_reset_token(token, expiration=3600):
+    # serializer = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
+    try:
+        user_id = serializer.loads(token, salt='password-reset-salt', max_age=expiration)
+    except:
+        return None
+    return user_id
 
+# Create an instance of Mail.
+# utils.py
+def create_mail_instance(app):
+    return Mail(app)
 
-
-
-
+def send_reset_email(app, email, token):
+    with app.app_context():  # Set the application context
+        mail = create_mail_instance(app)
+        reset_url = url_for('reset_password', token=token, _external=True)
+        msg = Message('Password Reset Request', sender='Dunistech <Codersrich@gmail.com>', recipients=[email])
+        msg.body = f'To reset your password, click the following link: {reset_url}'
+        msg.html = f'<p>To reset your password, click the following link: <a href="{reset_url}">{reset_url}</a></p>'
+        mail.send(msg)

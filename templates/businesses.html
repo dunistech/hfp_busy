@@ -35,9 +35,9 @@
                     <td>{{business.media_url}}</td>
                     <td>{{business.description}}</td>
                     <td class="action-cell">
-                        <a class="btn btn-danger" href="{{url_for('edit_business_media', business_id=business.id)}}">Media</a>
-                        <a class="btn btn-danger" href="{{url_for('delete_business', business_id=business.id)}}">Delete</a>
-                        <form action="{{url_for('update_business', business_id=business.id)}}"> 
+                        <a class="btn btn-danger" href="{{url_for('user.edit_business_media', business_id=business.id)}}">Media</a>
+                        <a class="btn btn-danger" href="{{url_for('admin.delete_business', business_id=business.id)}}">Delete</a>
+                        <form action="{{url_for('admin.update_business', business_id=business.id)}}"> 
                             <button type="submit" class="btn btn-success">Update</button></form>
                     </td>
                 </tr>

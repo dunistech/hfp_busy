@@ -18,3 +18,5 @@ steps_to_create_gitignore_and_requiremen_database_export
 
 # Ignore log files
 *.log
+
+udo mysql

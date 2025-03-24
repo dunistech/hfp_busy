@@ -253,7 +253,7 @@ def subscribe(business_id):
         finally:
             conn.close()
     
-    return redirect(url_for('user_business_profile'))
+    return redirect(url_for('user.user_business_profile'))
 
 @bp.route('/search_business', methods=['GET', 'POST'])
 def search_business():

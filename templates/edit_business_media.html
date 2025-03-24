@@ -136,7 +136,7 @@
                                 </p>
                                 {% if not business[5] %}
                                 <div class="subscription-form">
-                                    <form action="{{ url_for('subscribe', business_id=business[0]) }}" method="POST">
+                                    <form action="{{ url_for('business.subscribe', business_id=business[0]) }}" method="POST">
                                         <label for="plan">Select Subscription Plan:</label>
                                         <select name="plan_id" id="plan" required>
                                             {% for plan in subscription_plans %}
@@ -211,6 +211,6 @@
 
 
 
-<a href="{{ url_for('user_business_profile') }}">Back to Business Profile</a>
+<a href="{{ url_for('user.user_business_profile') }}">Back to Business Profile</a>
 
 {% endblock %}

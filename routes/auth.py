@@ -110,11 +110,12 @@ def register_user():
             
     # return render_template('register_user.html')
     # If GET request, render the form with empty fields
-    return render_template('register_user.html', 
-                           phone='', email='', website_url='', 
-                           social_handles='', description='', 
-                           name='', shop_no='', block_num='', 
-                           category='', username='', password='')  # Assume get_categories() fetches categories
+    return render_template(
+        'register_user.html', 
+        phone='', email='', website_url='', 
+        social_handles='', description='', 
+        name='', shop_no='', block_num='', 
+        category='', username='', password='')  # Assume get_categories() fetches categories
 
 @bp.route('/register_business', methods=['GET', 'POST'])
 def register_business():
@@ -158,12 +159,16 @@ def register_business():
             cur.close()
             conn.close()
 
-        return redirect(url_for('user_business_profile'))
+        return redirect(url_for('user.user_business_profile'))
 
     return render_template('register_business.html')
 
 @bp.route('/user_login', methods=['GET', 'POST'])
 def user_login():
+    
+    if 'user_logged_in' in session:
+        return redirect(url_for('user.update_profile')) 
+        
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -196,10 +201,7 @@ def user_login():
                         session['user_logged_in'] = True
                         session['user_id'] = user[0]  # Store user_id in the session
                         session['username'] = user[1]
-                        session['avatar'] = user[6]
-                        
-                        # for x in user:
-                        #     print(x)
+                        session['avatar'] = user[6] 
                             
                         flash("Login successful.", 'success')
                         return redirect(url_for('user.update_profile'))

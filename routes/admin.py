@@ -461,38 +461,42 @@ def unsuspend_user(user_id):
 
 @bp.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
-    if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
-        return redirect(url_for('auth.user_login'))
+    try:
+        if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
+            return redirect(url_for('auth.user_login'))
 
-    conn = get_db_connection()
-    if conn:
-        try:
-            cur = conn.cursor()
+        conn = get_db_connection()
+        if conn:
+            try:
+                cur = conn.cursor()
 
-            # Fetch the registration_request_id
-            cur.execute("SELECT registration_request_id FROM users WHERE id = %s", (user_id,))
-            registration_request_id = cur.fetchone()
+                # Fetch the registration_request_id
+                cur.execute("SELECT registration_request_id FROM users WHERE id = %s", (user_id,))
+                registration_request_id = cur.fetchone()
 
-            # Delete related claim requests
-            cur.execute("DELETE FROM claim_requests WHERE user_id = %s", (user_id,))
+                # Delete related claim requests
+                cur.execute("DELETE FROM claim_requests WHERE user_id = %s", (user_id,))
 
-            # Delete the user
-            cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+                # Delete the user
+                cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
 
-            # Manually delete the related registration request if the cascade didn't work
-            if registration_request_id and registration_request_id[0]:
-                cur.execute("DELETE FROM user_registration_requests WHERE id = %s", (registration_request_id,))
+                # Manually delete the related registration request if the cascade didn't work
+                if registration_request_id and registration_request_id[0]:
+                    # print("registration_request_id --", registration_request_id, registration_request_id[0])
+                    cur.execute("DELETE FROM user_registration_requests WHERE id = %s", (registration_request_id[0],))
 
-            conn.commit()
-            cur.close()
-            flash('User and associated data deleted successfully.', 'success')
-        except Exception as e:
-            flash(f"Database error: {e}", 'error')
-        finally:
-            conn.close()
+                conn.commit()
+                cur.close()
+                flash('User and associated data deleted successfully.', 'success')
+            except Exception as e:
+                traceback.print_exc()
+                flash(f"Database error: {e}", 'error')
+            finally:
+                conn.close()
 
-    return redirect(url_for('admin.admin_users'))
-
+        return redirect(url_for('admin.admin_users'))
+    except Exception as e:
+        return f"{e}"
 
 @bp.route('/admin/user/<int:user_id>/businesses')
 def view_user_businesses(user_id):
@@ -638,5 +642,4 @@ def delete(id_number):
     connection.close()
     
     return redirect(url_for('fetch'))
-## Delete from Users and user_registration_requests Table ##
-
+## Delete from Users and user_registration_requests Table 

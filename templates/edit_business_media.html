@@ -91,11 +91,107 @@
     }
 </style>
 
+<h1 class="text-center my-4">Upload Media | {{business.business_name}}</h1>
 
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-10 col-sm-12 mb-4">
+            <div class="card border-light shadow-sm card-container">
+                <div class="row col-12 card-body">
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                        <div class="card border-light shadow-sm card-container">
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    {% if business.media_type and business.media_url %}
+                                        {% if business.media_type == "image" %}
+                                            <img src="../{{ business.media_url }}" alt="Business Image" class="img-fluid img-circle" style="border: 2px solid #ddd;">
+                                        {% elif business.media_type == 'video' %}
+                                            <a href="{{ business.media_url }}" class="d-block">
+                                                <video class="img-fluid rounded" width="100px" height="75px" controls>
+                                                    <source src="../{{ business.media_url }}" type="video/mp4">
+                                                </video>
+                                            </a>
+                                        {% endif %}
+                                    {% else %}
+                                        <p class="text-muted">No media uploaded yet.</p>
+                                    {% endif %}
+                                </div>
+                                <h2 class="h5">{{ business.business_name }} (Shop No: {{ business.shop_no }})</h2>
+                                <div class="description my-2">
+                                    <p><i class="fas fa-align-left"></i> {{ business.description }}</p>
+                                </div>
+                                <p class="text-muted mb-1"><i class="fas fa-phone"></i> {{ business.phone_number }}</p>
+                                <p class="text-muted mb-1"><i class="fas fa-envelope"></i> {{ business.email }}</p>
+                                <p class="text-muted mb-1"><i class="fas fa-tags category-icon"></i> {{ business.category }}</p>
+                                <p class="text-muted mb-3">
+                                    <i class="fas {{ 'fa-check-circle text-success' if business.is_subscribed else 'fa-times-circle text-danger' }}"></i>
+                                    {{ 'Subscribed' if business.is_subscribed else 'Not Subscribed' }}
+                                </p>
+                                {% if not business.is_subscribed %}
+                                    <div class="subscription-form">
+                                        <form action="{{ url_for('business.subscribe', business_id=business.id) }}" method="POST">
+                                            <label for="plan">Select Subscription Plan:</label>
+                                            <select name="plan_id" id="plan" required>
+                                                {% for plan in subscription_plans %}
+                                                    <option value="{{ plan.id }}">
+                                                        {{ plan.plan_name }} - ₦{{ plan.amount }} 
+                                                        ({% if plan.duration == 1 %}{{ plan.duration }} month{% else %}{{ plan.duration }} months plan{% endif %})
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit">Subscribe</button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
 
-<h1 class="text-center my-4">Upload Media</h1>
+                    <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="text-center-container mb-3">
+                                {% if business.media_type and business.media_url %}
+                                    {% if business.media_type == "image" %}
+                                        <img src="../{{ business.media_url }}" alt="Business Image" class="img-fluid rounded media-fixed">
+                                    {% elif business.media_type == 'video' %}
+                                        <a href="{{ business.media_url }}" class="d-block">
+                                            <video class="img-fluid rounded media-fixed" controls>
+                                                <source src="../{{ business.media_url }}" type="video/mp4">
+                                            </video>
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-muted">No media uploaded yet.</p>
+                                {% endif %}
+                            </div>
 
+                            <div class="upload-media-container mt-3">
+                                <b class="text-danger m-4">Note: Only Subscribed Businesses Can Display/Change Their Media/Ads.</b>
+                                <h3><i class="fas fa-upload"></i> Upload Media</h3>
+                                <form action="{{ url_for('user.edit_business_media', business_id=business.id) }}" method="POST" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label for="media_type">Media Type:</label>
+                                        <select name="media_type" id="media_type" {{ "disabled=True" if not business.is_subscribed else '' }} class="form-control" required>
+                                            <option value="image">Image</option>
+                                            <option value="video">Video</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="file">Media File:</label>
+                                        <input type="file" name="file" id="file" {{ "disabled=True" if not business.is_subscribed else '' }} class="form-control-file" required>
+                                    </div>
+                                    <button type="submit" {{ "disabled=True" if not business.is_subscribed else '' }} class="btn btn-primary btn-sm btn-block">Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+{#
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-12 col-md-10 col-sm-12 mb-4">
@@ -207,7 +303,7 @@
         </div>
     </div>
 </div>
-
+#}
 
 
 

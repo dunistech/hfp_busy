@@ -1,0 +1,271 @@
+<!-- templates/add_business.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Add New Business</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- Business Basic Info -->
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="business_name" class="form-label">Business Name*</label>
+                                    <input type="text" class="form-control" id="business_name" name="business_name" required>
+                                    <div class="form-text">The official name of your business</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="categories" class="form-label">Categories*</label>
+                                    <select class="form-select" id="categories" name="categories" multiple required>
+                                        {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">Hold Ctrl/Cmd to select multiple categories</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description*</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                                <div class="form-text">Briefly describe what your business does</div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fas fa-address-book me-2"></i>Contact Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone_number" class="form-label">Phone Number*</label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="shop_no" class="form-label">Shop/Unit Number</label>
+                                    <input type="number" class="form-control" id="shop_no" name="shop_no">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="block_num" class="form-label">Block Number</label>
+                                    <input type="text" class="form-control" id="block_num" name="block_num">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="address" name="address">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Media Upload -->
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fas fa-camera me-2"></i>Business Media</h5>
+                            <div class="mb-3">
+                                <label for="business_media" class="form-label">Upload Image/Video</label>
+                                <input type="file" class="form-control" id="business_media" name="business_media" 
+                                       accept="image/*,video/*">
+                                <div class="form-text">Upload a logo, photo, or promotional video (max 5MB)</div>
+                            </div>
+                            <div class="text-center">
+                                <img id="mediaPreview" src="{{ url_for('static', filename='img/default-business.png') }}" 
+                                     class="img-fluid rounded mt-2" style="max-height: 200px; display: none;" alt="Media preview">
+                                <video id="videoPreview" controls class="img-fluid rounded mt-2" 
+                                       style="max-height: 200px; display: none;"></video>
+                            </div>
+                        </div>
+
+                        <!-- Social Media Links -->
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fas fa-share-alt me-2"></i>Social Media Links</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="facebook_link" class="form-label">Facebook</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-facebook-f"></i></span>
+                                        <input type="url" class="form-control" id="facebook_link" name="facebook_link" 
+                                               placeholder="https://facebook.com/yourpage">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="instagram_link" class="form-label">Instagram</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-instagram"></i></span>
+                                        <input type="url" class="form-control" id="instagram_link" name="instagram_link" 
+                                               placeholder="https://instagram.com/yourpage">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="twitter_link" class="form-label">Twitter</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-twitter"></i></span>
+                                        <input type="url" class="form-control" id="twitter_link" name="twitter_link" 
+                                               placeholder="https://twitter.com/yourpage">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="website_url" class="form-label">Website</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                        <input type="url" class="form-control" id="website_url" name="website_url" 
+                                               placeholder="https://yourwebsite.com">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Submit -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>
+                            </label>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('user.profile') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Submit Business
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Business Listing Agreement</h6>
+                <p>By submitting your business, you agree to:</p>
+                <ol>
+                    <li>Provide accurate and truthful information about your business</li>
+                    <li>Maintain appropriate content that complies with our community guidelines</li>
+                    <li>Update your listing whenever there are changes to your business information</li>
+                    <li>Not use the service for any illegal or prohibited activities</li>
+                </ol>
+                
+                <h6 class="mt-4">Content Guidelines</h6>
+                <p>Your business listing must not contain:</p>
+                <ul>
+                    <li>False or misleading information</li>
+                    <li>Offensive or inappropriate content</li>
+                    <li>Copyrighted material you don't have rights to</li>
+                    <li>Promotion of illegal products or services</li>
+                </ul>
+                
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    All listings are subject to review and approval by our administration team.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize select2 for categories
+$(document).ready(function() {
+    $('#categories').select2({
+        placeholder: "Select categories",
+        allowClear: true,
+        width: '100%'
+    });
+});
+
+// Media preview functionality
+document.getElementById('business_media').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const imgPreview = document.getElementById('mediaPreview');
+    const videoPreview = document.getElementById('videoPreview');
+    
+    // Hide both previews initially
+    imgPreview.style.display = 'none';
+    videoPreview.style.display = 'none';
+    
+    if (file.type.includes('image')) {
+        imgPreview.src = URL.createObjectURL(file);
+        imgPreview.style.display = 'block';
+    } else if (file.type.includes('video')) {
+        videoPreview.src = URL.createObjectURL(file);
+        videoPreview.style.display = 'block';
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const requiredFields = document.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (field.id === 'categories' && $('#categories').val() === null) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else if (!field.value.trim() && field.id !== 'categories') {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    if (!document.getElementById('terms').checked) {
+        document.getElementById('terms').classList.add('is-invalid');
+        isValid = false;
+    } else {
+        document.getElementById('terms').classList.remove('is-invalid');
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
+        // Scroll to first invalid field
+        document.querySelector('.is-invalid').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+});
+</script>
+
+<!-- Include Select2 CSS and JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+.form-control.is-invalid, .form-select.is-invalid, .form-check-input.is-invalid {
+    border-color: #dc3545;
+}
+.form-check-input.is-invalid {
+    border-color: #dc3545;
+}
+.select2-container--default .select2-selection--multiple.is-invalid {
+    border-color: #dc3545 !important;
+}
+</style>
+{% endblock %}

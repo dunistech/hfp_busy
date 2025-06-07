@@ -5,13 +5,7 @@ import mysql
 from utils import get_db_connection
 
 bp = Blueprint('business', __name__)
-
-# @bp.route('/register_business', methods=['GET', 'POST'])
-# def register_business():
-#     # Your business registration logic here
-#     pass
-
-# Add other business-related routes...
+       
 @bp.route('/businesses')
 def businesses():
     
@@ -212,7 +206,8 @@ def process_business_registration():
 @bp.route('/subscribe/<int:business_id>', methods=['POST'])
 def subscribe(business_id):
     
-    if 'user_logged_in' not in session or 'admin_id' not in session:
+    # if 'user_logged_in' not in session or 'admin_id' not in session:
+    if 'admin_id' not in session:
         return redirect(url_for('auth.user_login'))
     
     user_id = session.get('user_id')
@@ -253,54 +248,55 @@ def subscribe(business_id):
         finally:
             conn.close()
     
-    return redirect(url_for('user.user_business_profile'))
+    return redirect(request.referrer)
+    # return redirect(url_for('user.user_business_profile'))
 
-@bp.route('/search_business', methods=['GET', 'POST'])
-def search_business():
-    search_query = request.args.get('search_query', '')  # Get the search query from the URL parameters
-    businesses = []
+# @bp.route('/search_business', methods=['GET', 'POST'])
+# def search_business():
+#     search_query = request.args.get('search_query', '')  # Get the search query from the URL parameters
+#     businesses = []
 
-    if search_query:
-        conn = get_db_connection()
-        if conn:
-            try:
-                # Use DictCursor to fetch results as dictionaries
-                cur = conn.cursor(dictionary=True)
+#     if search_query:
+#         conn = get_db_connection()
+#         if conn:
+#             try:
+#                 # Use DictCursor to fetch results as dictionaries
+#                 cur = conn.cursor(dictionary=True)
                 
-                # Query to search businesses and prioritize subscribed ones
-                query = """
-                    SELECT DISTINCT b.id, b.media_url, b.phone_number, b.email, 
-                                    b.business_name, b.media_type, c.category_name, 
-                                    b.is_subscribed, b.timestamp
-                    FROM businesses b
-                    LEFT JOIN business_categories bc ON b.id = bc.business_id
-                    LEFT JOIN categories c ON bc.category_id = c.id
-                    WHERE (c.category_name LIKE %s OR b.category LIKE %s 
-                           OR b.business_name LIKE %s OR b.shop_no LIKE %s)
-                    ORDER BY b.is_subscribed DESC, b.timestamp DESC
-                """
+#                 # Query to search businesses and prioritize subscribed ones
+#                 query = """
+#                     SELECT DISTINCT b.id, b.media_url, b.phone_number, b.email, 
+#                                     b.business_name, b.media_type, c.category_name, 
+#                                     b.is_subscribed, b.timestamp
+#                     FROM businesses b
+#                     LEFT JOIN business_categories bc ON b.id = bc.business_id
+#                     LEFT JOIN categories c ON bc.category_id = c.id
+#                     WHERE (c.category_name LIKE %s OR b.category LIKE %s 
+#                            OR b.business_name LIKE %s OR b.shop_no LIKE %s)
+#                     ORDER BY b.is_subscribed DESC, b.timestamp DESC
+#                 """
                 
-                # Prepare search patterns with wildcards for partial matches
-                search_pattern = f"%{search_query}%"
+#                 # Prepare search patterns with wildcards for partial matches
+#                 search_pattern = f"%{search_query}%"
                 
-                cur.execute(query, (search_pattern, search_pattern, search_pattern, search_pattern))
-                businesses = cur.fetchall()
+#                 cur.execute(query, (search_pattern, search_pattern, search_pattern, search_pattern))
+#                 businesses = cur.fetchall()
 
-                cur.close()
-            except Exception as e:
-                flash(f"Database error: {e}", 'error')
-            finally:
-                conn.close()
+#                 cur.close()
+#             except Exception as e:
+#                 flash(f"Database error: {e}", 'error')
+#             finally:
+#                 conn.close()
 
-    # Check if businesses list is empty and pass an additional variable to the template
-    no_results_message = "No businesses found for your search." if not businesses else None
+#     # Check if businesses list is empty and pass an additional variable to the template
+#     no_results_message = "No businesses found for your search." if not businesses else None
 
-    context = {
-        "businesses": businesses, 
-        "search_query": search_query, 
-        "no_results_message": no_results_message
-    }
-    return render_template('search_result.html', **context)
+#     context = {
+#         "businesses": businesses, 
+#         "search_query": search_query, 
+#         "no_results_message": no_results_message
+#     }
+#     return render_template('search_result.html', **context)
 
 
 @bp.route('/claim_business/<int:business_id>', methods=['GET', 'POST'])

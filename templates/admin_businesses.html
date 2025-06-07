@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-store me-2"></i>Business Management</h5>
+            <span class="badge bg-light text-dark">{{ businesses|length }} businesses</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Business</th>
+                            <th>Owner</th>
+                            <th>Categories</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for business in businesses %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if business.media_url %}
+                                    <img src="{{ business.media_url }}" class="rounded me-3" width="40" height="40" alt="{{ business.business_name }}">
+                                    {% else %}
+                                    <div class="rounded bg-light me-3 d-flex align-items-center justify-content-center" style="width:40px;height:40px">
+                                        <i class="fas fa-store text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ business.business_name }}</h6>
+                                        <small class="text-muted">{{ business.description[:30] }}...</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="mailto:{{ business.owner_email }}">{{ business.owner_username }}</a>
+                            </td>
+                            <td>
+                                {% if business.categories %}
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for category in business.categories.split(', ') %}
+                                    <span class="badge bg-secondary">{{ category }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <span class="text-muted">No categories</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if business.status == 'active' else 'warning' if business.status == 'pending' else 'danger' }}">
+                                    {{ business.status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('user.business_profile', business_id=business.id) }}">
+                                                <i class="fas fa-eye me-2"></i>View
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <form method="POST" action="{{ url_for('user.admin_update_business_status', business_id=business.id) }}">
+                                                <input type="hidden" name="status" value="active">
+                                                <button type="submit" class="dropdown-item" {% if business.status == 'active' %}disabled{% endif %}>
+                                                    <i class="fas fa-check me-2"></i>Activate
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form method="POST" action="{{ url_for('user.admin_update_business_status', business_id=business.id) }}">
+                                                <input type="hidden" name="status" value="suspended">
+                                                <button type="submit" class="dropdown-item" {% if business.status == 'suspended' %}disabled{% endif %}>
+                                                    <i class="fas fa-pause me-2"></i>Suspend
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ business.id }}">
+                                                <i class="fas fa-trash me-2"></i>Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal{{ business.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">Confirm Deletion</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to permanently delete "{{ business.business_name }}"?</p>
+                                                <p class="text-danger">This action cannot be undone.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form method="POST" action="{{ url_for('user.delete_business', business_id=business.id) }}">
+                                                    <button type="submit" class="btn btn-danger">Delete Permanently</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

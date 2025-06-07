@@ -81,7 +81,7 @@ class Category(Base):
 
 class SubscriptionPlan(Base):
     __tablename__ = 'subscription_plans'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     plan_name = Column(String(50), nullable=False)
     amount = Column(DECIMAL(10, 2), nullable=False)

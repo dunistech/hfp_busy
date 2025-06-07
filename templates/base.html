@@ -27,6 +27,12 @@
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
 
+        <!--NEW -->
+      <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome (if using) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <style>
@@ -132,7 +138,7 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 
                                 {% for category in categories %}
-                                    <a href="{{ url_for('categories.category_view', category_id=category.id) }}" class="dropdown-item">
+                                    <a href="{{ url_for('user.businesses_by_category', category_id=category.id) }}" class="dropdown-item">
                                         {{ category.name }}
                                     </a>
                                 {% endfor %}
@@ -146,58 +152,28 @@
                     </ul>
 
                     
-                    {#
-                    {% if session.get('user_logged_in') %}
-                    <a href="{{ url_for('auth.register_business') }}" class="btn btn-lg ml-3"
-                        style="background-color: #040450;color: white;">Register Business</a>
+                    
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('user.profile') }}" class="btn btn-lg ml-3"
+                        style="background-color: #040450;color: white;">{{session.get('username')}}</a>
                     {% else %}
                     <!-- Business Owner Signin Button -->
-                    <a href="{{ url_for('auth.register_user') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
-                        style="background-color: #040450;color: white;">Business Owner
-                        Signin</a>
+                    <a href="{{ url_for('auth.login') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
+                        style="background-color: #040450;color: white;">Sign in</a>
                     {% endif %}
-                    #}
+                    
                      <!--- ma said, weather or not logged, button should still remain Register Business --
-                     <a href="{{ url_for('auth.register_user') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
+                     <a href="{{ url_for('auth.register') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
                         style="background-color: #040450;color: white;">Create Business Account</a>-- -->
 
                         
 
-                          <div class="btn-group">
-                            <button type="button" class="btn btn-secondary dropdown-toggle py-md-3 px-md-5 mt-2 btn-lg rounded" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          {#<div class="btn-group">
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-secondary py-md-3 px-md-5 mt-2 btn-lg rounded" 
+            >
                               Account
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ url_for('auth.user_login') }}">Log into Account</a>
-                                <a class="dropdown-item" href="{{ url_for('auth.register_user') }}">Register Busineses</a>
-                            </div>
-                          </div>
-                    {#
-                    {% if session.get('user_logged_in') %}
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link d-flex align-items-center" id="profileDropdown" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #212121;">
-                            <img src="../{{ session['avatar'] }}" alt="img" class="rounded-circle"
-                                style="width: 40px; height: 40px; object-fit: cover;">
-                            <span class="ml-2">{{ username }}</span> <i class="fa fa-chevron-down ml-2"></i>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="profileDropdown">
-                            <a href="{{ url_for('user.update_profile') }}" class="dropdown-item"><i
-                                    class="fa fa-user mr-2"></i> {{
-                                        session['username'] }} Profile</a>
-
-                            <a href="{{ url_for('user.user_business_profile') }}" class="dropdown-item"><i
-                                    class="fa fa-briefcase mr-2"></i>
-                                Business Profile</a>
-                            <a href="{{ url_for('auth.register_business') }}" class="dropdown-item"><i
-                                    class="fa fa-plus-circle mr-2"></i> Register Business</a>
-                            <a href="{{ url_for('auth.logout') }}" class="dropdown-item"><i
-                                    class="fa fa-sign-out-alt mr-2"></i>
-                                Logout</a>
-                        </div>
-                    </div>
-                    {% endif %}
-                    #}
+                            </a>
+                          </div>#}
 
                 </div>
             </nav>
@@ -209,81 +185,6 @@
     {% endblock %}
 
     <div id="contact"></div>
-<!-- Footer Start --
-<div class="container-fluid bg-light text-dark py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
-    <div class="row pt-5">
-        <div class="col-lg-4 col-md-6 mb-5">
-            <a href="#" class="navbar-brand">
-                <span class="text-dark">
-                    <img src="{{ logo_path }}" width="200px" class="img-fluid" alt="Dunis Tech Logo">
-                </span>
-            </a>
-            <p>Dunis Technologies Limited is a global tech company that builds innovative software, grooms tech experts via professional training and mentorship, and renders computer sales and services. For more, please visit <a href="https://dunistech.ng" target="_blank">dunistech.ng</a>.</p>
-            <h6 class="text-dark text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Follow Us</h6>
-            <div class="d-flex justify-content-start">
-                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
-                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
-                <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
-                <a class="btn btn-outline-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6 mb-5">
-            <h5 class="text-dark text-uppercase mb-4" style="letter-spacing: 5px;">Our Services</h5>
-            <div class="d-flex flex-column justify-content-start">
-                <a class="text-dark mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Software Development</a>
-                <a class="text-dark mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Web Design, Hosting & Maintenance</a>
-                <a class="text-dark mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Coding & Computer Training School</a>
-                <a class="text-dark" href="#"><i class="fa fa-angle-right mr-2"></i>Computer & Accessories Sales</a>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6 mb-5">
-            <h5 class="text-dark text-uppercase mb-4" style="letter-spacing: 5px;">Contact Us</h5>
-            <div class="col">
-                
-            <p><i class="fa fa-map-marker-alt mr-2"></i>GRACELAND ESTATE, 1 Gbade Amao St, <br> Ajiwe, Lekki 3, Lagos</p> 
-            <p><i class="fa fa-phone-alt mr-2"></i>
-                <a href="tel:+234 704 394 4279">+234 704 394 4279</a> |
-                <a href="tel:07032276597">07032276597</a>
-            </p>
-            </div>
-            <hr>
-            <div class="col">
-            <p><i class="fa fa-map-marker-alt mr-2"></i>HFP EASTLINE SHOPPING COMPLEX, ABRAHAM ADESANYA TRAFFIC LIGHT
-                 <br>BLOCK F4, SHOPE 39 & 40.</p> 
-            <p><i class="fa fa-phone-alt mr-2"></i>
-                <a href="tel:+234 812 247 7213">+234 812 247 7213</a> |
-                <a href="tel:07032276597">07032276597</a>
-            </p>
-            </div>
-
-            <hr>
-            
-            <p><i class="fa fa-envelope mr-2"></i><a href="mailto:info@dunistech.ng">info@dunistech.ng</a></p>
-            <h6 class="text-dark text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">JOIN OUR MAILING LIST</h6>
-            <p>To get training, events, and product updates</p>
-            <div class="w-100">
-                <div class="input-group">
-                    <input type="text" class="form-control rounded" style="padding: 25px;" placeholder="Type or paste your email here">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary px-3 rounded btn-lg">SUBMIT</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-<div class="container-fluid bg-light text-dark border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(0, 0, 0, .1) !important;">
-    <div class="row">
-        <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
-            <p class="m-0 text-dark">Copyright &copy; <a href="#">Dunis Tech</a>. All Rights Reserved.</p>
-        </div>
-        <div class="col-lg-6 text-center text-md-right">
-            <p class="m-0 text-dark">Designed by <a href="#">Dunistech Coders</a></p>
-        </div>
-    </div>
-</div>
-<!-- Footer End -->
 
 <!-- Footer Start -->
 <div class="container-fluid bg-light text-dark py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
@@ -379,6 +280,9 @@
     <!-- Template Javascript -->
     <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
 
+    <!-- jQuery first, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

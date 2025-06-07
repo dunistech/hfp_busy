@@ -1,0 +1,144 @@
+<!-- templates/_business_card.html -->
+<!-- This partial template is included in all pages -->
+<div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+    <div class="card h-100 business-card {% if not business.is_subscribed %}unsubscribed-business{% endif %} {% if business.status != 'active' %}status-{{ business.status }}{% endif %}">
+        {% if business.status != 'active' %}
+        <div class="position-absolute top-0 start-50 translate-middle mt-2">
+            <span class="badge bg-{% if business.status == 'pending' %}info{% else %}secondary{% endif %}">
+                {{ business.status|title }}
+            </span>
+        </div>
+        {% endif %}
+        
+        <div class="business-media position-relative" style="height: 180px; overflow: hidden;">
+            {% if business.media_type and business.media_url %}
+                {% if business.media_type == 'image' %}
+                <img src="{{ business.media_url }}" 
+                     class="img-fluid w-100 h-100 object-fit-cover" 
+                     alt="{{ business.business_name }}">
+                {% else %}
+                <div class="video-thumbnail w-100 h-100">
+                    <video class="w-100 h-100">
+                        <source src="{{ business.media_url }}" type="video/mp4">
+                    </video>
+                    <div class="play-icon"><i class="fas fa-play"></i></div>
+                </div>
+                {% endif %}
+            {% else %}
+            <div class="placeholder-media d-flex align-items-center justify-content-center w-100 h-100 bg-light">
+                <i class="fas fa-store fa-3x text-muted"></i>
+            </div>
+            {% endif %}
+            
+            {% if business.is_subscribed %}
+            <span class="position-absolute top-0 start-0 m-2 badge bg-gold">
+                <i class="fas fa-crown me-1"></i> Premium
+            </span>
+            {% endif %}
+            
+            <span class="position-absolute top-0 end-0 m-2 badge bg-primary">
+                {{ business.primary_category if business.primary_category else 'General' }}
+                {% if business.category_count and business.category_count > 1 %}
+                +{{ business.category_count - 1 }}
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="card-body">
+            <h5 class="card-title">{{ business.business_name }}</h5>
+            <p class="card-text text-muted small mb-3">
+                {{ business.description|truncate(80) if business.description else 'No description provided' }}
+            </p>
+            
+            <div class="d-flex justify-content-between small mb-2">
+                {% if business.is_subscribed and business.status == 'active' %}
+                <span class="text-muted">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    {% if business.block_num %}Block {{ business.block_num }}{% endif %}
+                    {% if business.shop_no %}| Shop {{ business.shop_no }}{% endif %}
+                </span>
+                {% else %}
+                <span class="text-muted">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    <span class="text-warning">
+                        <i class="fas fa-lock me-1"></i>Location Protected
+                    </span>
+                </span>
+                {% endif %}
+            </div>
+            
+            {% if business.is_subscribed and business.status == 'active' %}
+            <div class="contact-info mt-3">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-phone-alt text-primary me-2"></i>
+                    <a href="tel:{{ business.phone_number }}" class="text-decoration-none">{{ business.phone_number }}</a>
+                </div>
+                {% if business.email %}
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-envelope text-primary me-2"></i>
+                    <a href="mailto:{{ business.email }}" class="text-decoration-none">{{ business.email|truncate(25) }}</a>
+                </div>
+                {% endif %}
+            </div>
+            {% elif business.status == 'active' %}
+            <div class="upgrade-prompt bg-light p-3 rounded text-center mt-3">
+                <i class="fas fa-lock text-warning fa-2x mb-2"></i>
+                <p class="small mb-2 fw-bold">Premium Content Locked</p>
+                <p class="small text-muted mb-2">Subscribe to unlock:</p>
+                <ul class="small text-start mb-3">
+                    <li>Full contact details</li>
+                    <li>Exact location & shop number</li>
+                    <li>Social media links</li>
+                    <li>Website information</li>
+                </ul>
+                {% if business.owner_id == session.get('user_id') %}
+                <a href="{{ url_for('user.profile') }}" class="btn btn-sm btn-warning">
+                    <i class="fas fa-crown me-1"></i>Upgrade Now
+                </a>
+                {% else %}
+                <small class="text-muted">Contact business owner to upgrade</small>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer bg-transparent border-top">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% if 'user_id' in session %}{{ url_for('user.public_business_profile', business_id=business.id) }}{% else %}{{ url_for('auth.login', next=url_for('user.public_business_profile', business_id=business.id)) }}{% endif %}" 
+                    class="btn btn-sm {% if business.status == 'active' %}btn-outline-primary{% else %}btn-outline-secondary{% endif %}">
+                    {% if business.is_subscribed and business.status == 'active' %}
+                        View Full Details
+                    {% else %}
+                        View Limited Info
+                    {% endif %}
+                </a>
+                
+                {% if business.is_subscribed and business.status == 'active' %}
+                <div class="social-links">
+                    {% if business.website_url %}
+                    <a href="{{ business.website_url }}" target="_blank" class="text-muted me-2" title="Website">
+                        <i class="fas fa-globe"></i>
+                    </a>
+                    {% endif %}
+                    {% if business.facebook_link %}
+                    <a href="{{ business.facebook_link }}" target="_blank" class="text-muted me-2" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    {% endif %}
+                    {% if business.instagram_link %}
+                    <a href="{{ business.instagram_link }}" target="_blank" class="text-muted me-2" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="social-links">
+                    <span class="text-muted small">
+                        <i class="fas fa-lock me-1"></i>Links Protected
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

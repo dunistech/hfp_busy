@@ -48,30 +48,21 @@
 </div>
 <!-- Carousel End -->
 
-
-
-<!-- Booking Start -->
 <div class="container-fluid booking mt-5 pb-5">
     <div class="container pb-5">
         <div class="search-container shadow">
             <div class="row align-items-center" style="min-height: 60px;">
-                <!-- On large screens (lg and above), the input takes 9 columns and the button takes 3 columns -->
-                <!-- On smaller screens (sm and below), both take 12 columns, stacking on top of each other -->
                 <div class="col-lg-12 col-md-12 mb-3 mb-lg-0">
-                    <form action="{{ url_for('business.search_business') }}" method="get">
+                    <form action="{{ url_for('user.search_business') }}" method="get">
                         <input type="text" name="search_query"
                             placeholder="Search by category, business name, or shop number" required>
                         <button class="btn btn-primary btn-block" type="submit">Search</button>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
-
-
-<!-- Booking End -->
 
 <!-- Feature Start -->
 <div class="container-fluid pb-5">
@@ -121,108 +112,257 @@
 <!-- Businesses Directory -->
 <div class="container-fluid py-5">
     <div class="container pt-5 pb-3">
-        <div class="text-center mb-3 pb-3">
-            <h2 class="text-dark text-uppercase" style="letter-spacing: 20px;">Explore HFP Businesses</h2>
+        <div class="text-center mb-4">
+            <h2 class="text-dark text-uppercase" style="letter-spacing: 10px;">Explore HFP Businesses</h2>
+            <p class="lead text-muted">Premium businesses get priority placement and full visibility</p>
         </div>
-        <div class="row" id="business-container">
 
-            <!---- ------>
+        <!-- Subscription Callout -->
+        <div class="alert alert-warning mb-4">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <i class="fas fa-crown me-2"></i>
+                    <strong>Want more visibility?</strong> Upgrade to Premium to showcase your contact details and appear first in searches.
+                </div>
+                <a href="{% if 'user_id' in session %}{{ url_for('user.profile') }}{% else %}{{ url_for('auth.login', next=url_for('user.profile')) }}{% endif %}" 
+                   class="btn btn-sm btn-warning">
+                    View Subscription Plans
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
             {% if businesses %}
-            {{businesses.is_subscribed}}
-            {% for business in businesses %}
-
-                <div class="col-lg-4 col-md-4 col-sm-6 col-12 rounded mb-4 store_hei business-item pb-4">
-                    <div class="package-item bg-white mb-2 h-100">
-                        {% if business.media_type and business.media_url %}
-                        {% if business.media_type == 'image' %}
-                        <div class="image-container" style="height: 200px; overflow: hidden;">
-                            <h6 class="m-0">
-                                <i class="fa fa-star text-primary mr-2"
-                                    style="position: absolute; text-shadow: 2px 2px 4px rgba(216, 216, 216, 0.5);">
-                                    <span>premier</span>
-                                </i>
-                            </h6>
-                            <img src="../{{ business.media_url }}" alt="Business Image" class="img-fluid"
-                                style=" width: 100%; height: 100%;">
-                        </div>
-                        {% elif business.media_type == 'video' %}
-                        <div class="image-container" style="height: 200px; overflow: hidden;">
-                            <h6 class="m-0">
-                                <i class="fa fa-star text-primary mr-2"
-                                    style="position: absolute; text-shadow: 2px 2px 4px rgba(216, 216, 216, 0.5);">
-                                    <span>premier</span>
-                                </i>
-                            </h6>
-                            <video width="100%" height="100%" controls
-                                style=" width: 100%; height: 100%;">
-                                <source src="../{{ business.media_url }}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
+                {% for business in businesses %}
+                <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 business-card {% if not business.is_subscribed %}unsubscribed-business{% endif %} {% if business.status != 'active' %}status-{{ business.status }}{% endif %}">
+                        <!-- Status Badge -->
+                        {% if business.status != 'active' %}
+                        <div class="position-absolute top-0 start-50 translate-middle mt-2">
+                            <span class="badge bg-{% if business.status == 'pending' %}info{% else %}secondary{% endif %}">
+                                {{ business.status|title }}
+                            </span>
                         </div>
                         {% endif %}
-                        {% else %}
-                        <div class="image-container" style="height: 200px; overflow: hidden;">
-                            <h6 class="m-0">
-                                <i class="fa fa-star text-primary mr-2" style="position: absolute;">
-                                    <span>premier</span>
-                                </i>
-                            </h6>
-                            <a href="{{ url_for('auth.register_user') }}">
-                                <img src="./static/img/dunis_placeholder.png" alt="Business Image"
-                                    class="img-fluid rounded" style=" width: 100%; height: 100%;">
-                            </a>
-                        </div>
-                        {% endif %}
-                        <div class="p-4">
-                            <div class="d-flex justify-content-between mb-3">
-                                <small class="m-0"><i class="fa fa-phone-alt text-primary mr-2"></i>{{ business.phone_number }}</small>
-                                <small class="m-0"><i class="fa fa-store text-primary mr-2"></i>{{ business.category }}</small>
-                            </div>
-                            <a class="h5 text-decoration-none"
-                                style="display: flex !important; justify-content: center !important; font-weight: bold;"
-                                href="#">{{ business.business_name }}</a>
-                            <div class="border-top mt-4 pt-4">
-                                <div class=""
-                                    style="display: flex !important; justify-content: center !important; align-items: center !important;">
-                                    <h6 class="m-0"> <span class="text-primary">
-                                    <a href='{{business.website_url or business.social_handles}}'> {{business.website_url or business.social_handles or "your-site.com"}} </a>
-                                    </span>
-                                    </h6>
-                                </div>
-                                <!---->
-                                                            <!-- Claim Button -->
-                                {% if business['owner_id'] is none %}
-                                <div class="text-center mt-3">
-                                    <a href="{{ url_for('auth.register_user') }}" class="btn btn-danger rounded">Register Business</a>
-                                </div>
+                        
+                        <!-- Business Media -->
+                        <div class="business-media position-relative" style="height: 180px; overflow: hidden;">
+                            {% if business.media_type and business.media_url %}
+                                {% if business.media_type == 'image' %}
+                                <img src="{{ business.media_url }}" 
+                                     class="img-fluid w-100 h-100 object-fit-cover" 
+                                     alt="{{ business.business_name }}">
                                 {% else %}
-                                <div class="text-center mt-3">
-                                    <a href="{{ url_for('auth.user_login')}}" class="btn btn-primary rounded">
-                                        Location: {{business['block_num']}} | Shop: {{business['shop_no']}}</a>
+                                <div class="video-thumbnail w-100 h-100">
+                                    <video class="w-100 h-100">
+                                        <source src="{{ business.media_url }}" type="video/mp4">
+                                    </video>
+                                    <div class="play-icon"><i class="fas fa-play"></i></div>
                                 </div>
                                 {% endif %}
-                                <!---->
+                            {% else %}
+                            <div class="placeholder-media d-flex align-items-center justify-content-center w-100 h-100 bg-light">
+                                <i class="fas fa-store fa-3x text-muted"></i>
                             </div>
+                            {% endif %}
+                            
+                            <!-- Premium Badge -->
+                            {% if business.is_subscribed %}
+                            <span class="position-absolute top-0 start-0 m-2 badge bg-gold">
+                                <i class="fas fa-crown me-1"></i> Premium
+                            </span>
+                            {% endif %}
+                            
+                            <!-- Category Badge -->
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-primary">
+                                {{ business.category.split(', ')[0] if business.category else 'General' }}
+                                {% if business.category and business.category.split(', ')|length > 1 %}
+                                +{{ business.category.split(', ')|length - 1 }}
+                                {% endif %}
+                            </span>
                         </div>
+                        
+                        <!-- Business Info -->
+                        {#<div class="card-body">
+                            <h5 class="card-title">{{ business.business_name }}</h5>
+                            <p class="card-text text-muted small mb-3">
+                                {{ business.description|truncate(80) if business.description else 'No description provided' }}
+                            </p>
+                            
+                            <!-- Location Info - Restricted for non-subscribed -->
+                            <div class="d-flex justify-content-between small mb-2">
+                                {% if business.is_subscribed and business.status == 'active' %}
+                                <span class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Block {{ business.block_num }} | Shop {{ business.shop_no }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    <span class="text-warning">
+                                        <i class="fas fa-lock me-1"></i>Location Protected
+                                    </span>
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Contact Info - Only for subscribed businesses -->
+                            {% if business.is_subscribed and business.status == 'active' %}
+                            <div class="contact-info mt-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-phone-alt text-primary me-2"></i>
+                                    <a href="tel:{{ business.phone_number }}" class="text-decoration-none">{{ business.phone_number }}</a>
+                                </div>
+                                {% if business.email %}
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-envelope text-primary me-2"></i>
+                                    <a href="mailto:{{ business.email }}" class="text-decoration-none">{{ business.email|truncate(25) }}</a>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% elif business.status == 'active' %}
+                            <div class="upgrade-prompt bg-light p-3 rounded text-center mt-3">
+                                <i class="fas fa-lock text-warning fa-2x mb-2"></i>
+                                <p class="small mb-2 fw-bold">Premium Content Locked</p>
+                                <p class="small text-muted mb-2">Subscribe to unlock:</p>
+                                <ul class="small text-start mb-3">
+                                    <li>Full contact details</li>
+                                    <li>Exact location & shop number</li>
+                                    <li>Social media links</li>
+                                    <li>Website information</li>
+                                </ul>
+                                {% if business.owner_id == session.get('user_id') %}
+                                <a href="{{ url_for('user.profile') }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-crown me-1"></i>Upgrade Now
+                                </a>
+                                {% else %}
+                                <small class="text-muted">Contact business owner to upgrade</small>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>#}
+                        <div class="card-body">
+            <h5 class="card-title">{{ business.business_name }}</h5>
+            <p class="card-text text-muted small">{{ business.description|truncate(100) }}</p>
+            
+            <!-- Contact Info (only shown for subscribed businesses) -->
+            {% if business.is_subscribed %}
+            <div class="contact-info">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-phone-alt text-primary me-2"></i>
+                    <a href="tel:{{ business.phone_number }}">{{ business.phone_number }}</a>
+                </div>
+                {% if business.email %}
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-envelope text-primary me-2"></i>
+                    <a href="mailto:{{ business.email }}">{{ business.email }}</a>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="upgrade-prompt bg-light p-3 rounded text-center">
+                <i class="fas fa-lock text-warning fa-2x mb-2"></i>
+                <p class="small mb-2">Subscribe to unlock contact details</p>
+                <a href="{{ url_for('user.profile') }}" class="btn btn-sm btn-warning">
+                    Upgrade Now
+                </a>
+            </div>
+            {% endif %}
+        </div>
+                        
+                <!-- Footer -->
+                <div class="card-footer bg-transparent border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% if 'user_id' in session %}{{ url_for('user.public_business_profile', business_id=business.id) }}{% else %}{{ url_for('auth.login', next=url_for('user.public_business_profile', business_id=business.id)) }}{% endif %}" 
+                            class="btn btn-sm {% if business.status == 'active' %}btn-outline-primary{% else %}btn-outline-secondary{% endif %}">
+                            {% if business.is_subscribed and business.status == 'active' %}
+                                View Full Details
+                            {% else %}
+                                View Limited Info
+                            {% endif %}
+                        </a>
+                        
+                        <!-- Social Links - Only for subscribed businesses -->
+                        {% if business.is_subscribed and business.status == 'active' %}
+                        <div class="social-links">
+                            {% if business.website_url %}
+                            <a href="{{ business.website_url }}" target="_blank" class="text-muted me-2" title="Website">
+                                <i class="fas fa-globe"></i>
+                            </a>
+                            {% endif %}
+                            {% if business.facebook_link %}
+                            <a href="{{ business.facebook_link }}" target="_blank" class="text-muted me-2" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            {% endif %}
+                            {% if business.instagram_link %}
+                            <a href="{{ business.instagram_link }}" target="_blank" class="text-muted me-2" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div class="social-links">
+                            <span class="text-muted small">
+                                <i class="fas fa-lock me-1"></i>Links Protected
+                            </span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
-                
-            {% endfor %}
-            
+        </div>
+    </div>
+                {% endfor %}
             {% else %}
             <div class="col-12">
-                <div class="alert alert-info text-center" role="alert"
-                    style="background-color: #040450; padding: 10px; color: #fff;">
-                    No businesses found for your search.
+                <div class="alert alert-info text-center py-4">
+                    <i class="fas fa-store fa-2x mb-3"></i>
+                    <h4>No businesses found yet</h4>
+                    <p class="mb-3">Be the first to register your business in our directory</p>
+                    <a href="{{ url_for('auth.register_business') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> Add Your Business
+                    </a>
                 </div>
             </div>
             {% endif %}
-
-            <!------- ------>
         </div>
+        
+        <!-- Pagination -->
+        {% if pagination and pagination.total > pagination.per_page %}
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('index.home', page=pagination.page-1) }}">
+                        &laquo; Previous
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for p in range(1, (pagination.total // pagination.per_page) + 2) %}
+                    {% if p == pagination.page %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ p }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('index.home', page=p) }}">{{ p }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('index.home', page=pagination.page+1) }}">
+                        Next &raquo;
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
     </div>
 </div>
-<!-- Businesses Directory -->
 
 <div id="about"></div>
 
@@ -268,18 +408,94 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Adjust opacity here */
-        z-index: 1; /* Ensure it sits behind the text */
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1;
     }
     
     .container {
         position: relative;
-        z-index: 2; /* Ensure text is above the overlay */
+        z-index: 2;
     }
-    
+
+    .business-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    .business-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .unsubscribed-business {
+        opacity: 0.85;
+        border: 1px solid #eee;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    }
+
+    .unsubscribed-business:hover {
+        opacity: 1;
+    }
+
+    .bg-gold {
+        background-color: #ffd700;
+        color: #000;
+    }
+
+    .video-thumbnail {
+        position: relative;
+    }
+
+    .play-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 2rem;
+        text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .status-pending {
+        border-left: 4px solid #0dcaf0;
+    }
+
+    .status-suspended {
+        border-left: 4px solid #6c757d;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    .upgrade-prompt {
+        border-left: 3px solid var(--bs-warning);
+        background: linear-gradient(135deg, rgba(255,193,7,0.1) 0%, rgba(255,193,7,0.05) 100%);
+        border-radius: 8px;
+    }
+
+    .upgrade-prompt ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .upgrade-prompt li {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 4px;
+    }
+
+    .upgrade-prompt li:before {
+        content: "🔒";
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
 </style>
+
 <div class="container-fluid bg-registration py-5" style="position: relative; margin: 0px 0;">
-    <div class="overlay"></div> <!-- Overlay Div -->
+    <div class="overlay"></div>
     <div class="container py-5">
         <div class="row">
             <!-- Standard Membership Section -->
@@ -379,7 +595,7 @@
                             <a class="text-primary text-uppercase text-decoration-none" href="">Real Results from Real
                                 Clients</a>
                         </div>
-                        <a class="h5 m-0 text-decoration-none" href="">Read about how we’ve helped businesses
+                        <a class="h5 m-0 text-decoration-none" href="">Read about how we've helped businesses
                             thrive.</a>
                     </div>
                 </div>

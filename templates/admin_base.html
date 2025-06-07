@@ -51,13 +51,6 @@
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div><!-- End Logo -->
 
-        <div class="search-bar">
-            <form class="search-form d-flex align-items-center" method="POST" action="#">
-                <input type="text" name="query" placeholder="Search" title="Enter search keyword">
-                <button type="submit" title="Search"><i class="bi bi-search"></i></button>
-            </form>
-        </div><!-- End Search Bar -->
-
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
 
@@ -66,40 +59,6 @@
                         <i class="bi bi-search"></i>
                     </a>
                 </li><!-- End Search Icon-->
-
-                <li class="nav-item dropdown">
-
-                    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-plus"></i>
-                        <span class="badge bg-primary badge-number">{{ pending_user_registration_request_count }}</span>
-                    </a><!-- End Notification Icon -->
-
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-                        <li class="dropdown-footer">
-                            <a href="#">Show Business Owner Sigin Request</a>
-                        </li>
-
-                    </ul><!-- End Notification Dropdown Items -->
-
-                </li><!-- End Notification Nav -->
-
-                <li class="nav-item dropdown">
-
-                    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-                        <i class="fas fa-briefcase"></i>
-                        <span class="badge bg-success badge-number">{{ pending_business_registration_requests_count
-                            }}</span>
-                    </a><!-- End Messages Icon -->
-
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
-
-                        <li class="dropdown-footer">
-                            <a href="#">Show Business Request</a>
-                        </li>
-
-                    </ul><!-- End Messages Dropdown Items -->
-
-                </li><!-- End Messages Nav -->
 
                 <li class="nav-item dropdown pe-3">
 
@@ -195,32 +154,19 @@
                 </a>
             </li><!-- End Dashboard Nav -->
 
+            <li class="nav-heading">Others</li>
+
             <li class="nav-item">
-                <a class="nav-link " href="{{ url_for('business.businesses') }}">
-                    <i class="bi bi-grid"></i>
+                <a class="nav-link" href="{{ url_for('business.businesses') }}">
+                    <i class="bi bi-briefcase"></i>
                     <span>Hfp Busineseses</span>
                 </a>
             </li><!-- End Dashboard Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ url_for('admin.admin_dashboard') }}">
-                    <i class="bi bi-people"></i>
-                    <span>User Registrations</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ url_for('admin.admin_dashboard') }}">
-                    <i class="bi bi-briefcase"></i>
-                    <span>Business Registrations</span>
-                </a>
-            </li>
-            
-            <li class="nav-heading">Pages</li>
-
-            <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ url_for('admin.admin_users') }}">
                     <i class="bi bi-person"></i>
-                    <span>Manage Users</span>
+                    <span>Users</span>
                 </a>
             </li><!-- End Manage Users Page Nav -->
 

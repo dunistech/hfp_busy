@@ -1,0 +1,111 @@
+<!-- templates/search_results.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="container pt-5 pb-3">
+        <!-- Search Header -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2 class="text-dark">
+                    {% if search_query %}
+                        Search Results for "{{ search_query }}"
+                    {% else %}
+                        Businesses in {{ all_categories|selectattr("id", "equalto", selected_category|int)|map(attribute="category_name")|first }}
+                    {% endif %}
+                </h2>
+                <p class="lead text-muted">{{ pagination.total }} result{% if pagination.total != 1 %}s{% endif %} found</p>
+            </div>
+            <div class="col-md-4">
+                <form action="{{ url_for('user.search_business') }}" method="get" class="mb-3">
+                    <div class="input-group">
+                        <input type="text" name="search_query" class="form-control" 
+                               placeholder="Search again..." value="{{ search_query }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3"><i class="fas fa-filter me-2"></i>Filters</h5>
+                        <form method="get" action="{{ url_for('user.search_business') }}">
+                            <input type="hidden" name="search_query" value="{{ search_query }}">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select name="category" id="category" class="form-select">
+                                        <option value="">All Categories</option>
+                                        {% for cat in all_categories %}
+                                        <option value="{{ cat.id }}" 
+                                                {% if selected_category == cat.id|string %}selected{% endif %}>
+                                            {{ cat.category_name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Status</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="status" id="status-all" autocomplete="off" checked>
+                                        <label class="btn btn-outline-secondary" for="status-all">All</label>
+                                        
+                                        <input type="radio" class="btn-check" name="status" id="status-active" autocomplete="off">
+                                        <label class="btn btn-outline-success" for="status-active">Active</label>
+                                        
+                                        <input type="radio" class="btn-check" name="status" id="status-premium" autocomplete="off">
+                                        <label class="btn btn-outline-warning" for="status-premium">Premium</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-filter me-1"></i> Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="row g-4">
+            {% if businesses %}
+                {% for business in businesses %}
+                <!-- Business Card (same as home page template) -->
+                {% include '_business_card.html' %}
+                {% endfor %}
+            {% else %}
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-4"></i>
+                        <h4>No businesses found</h4>
+                        <p class="text-muted mb-4">
+                            {% if search_query %}
+                                No results match your search for "{{ search_query }}"
+                            {% else %}
+                                No businesses found in this category
+                            {% endif %}
+                        </p>
+                        <a href="{{ url_for('index.home') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-1"></i> Return Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Pagination (same as home page template) -->
+        {% include '_pagination.html' %}
+    </div>
+</div>
+{% endblock %}

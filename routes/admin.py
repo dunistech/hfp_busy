@@ -1,645 +1,576 @@
+import os
 import traceback
-from flask import Blueprint, request, render_template, redirect, session, url_for, flash
-from utils import serializer, get_db_connection, upload_file
+from flask import Blueprint, current_app as app, request, render_template, redirect, session, url_for, flash
+from utils import allowed_file, get_db_connection
+from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
-bp = Blueprint('admin', __name__)
+# bp = Blueprint('user', __name__)
+bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-# Add other admin-related routes...
-### Admin Routes ###
-@bp.route('/admin_login', methods=['GET', 'POST'])
-def admin_login():
-    
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = get_db_connection()
-        
-        if conn:
+# ======================
+# HELPER FUNCTIONS
+# ======================
+
+def admin_required(f):
+    """Decorator to ensure user has admin privileges"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session or session.get('role') != 'admin':
+            flash('Administrator access required', 'error')
+            return redirect(url_for('auth.login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def owner_or_admin_required(business_id):
+    """Decorator factory to ensure user is owner or admin"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'user_id' not in session:
+                flash('Please log in to access this page.', 'error')
+                return redirect(url_for('auth.login'))
+            
+            conn = get_db_connection()
             try:
                 cur = conn.cursor()
-                cur.execute("SELECT * FROM admin WHERE username = %s", (username,))
-                
-                admin = cur.fetchone()
-                cur.close()
-                conn.close()
-
-                if admin and check_password_hash(admin[3], password):  # Assuming password is in the 3rd column
-                    session['admin_logged_in'] = True
-                    
-                    # Loop through admin info and save each column in the session
-                    column_names = ['admin_id', 'admin_username', 'admin_email', 'admin_profile_pic']
-                    for i, column_name in enumerate(column_names):
-                        session[column_name] = admin[i]
-                    
-                    flash('Admin has logged in successfully.', 'success')
-                    return redirect(url_for('admin.admin_dashboard'))
-                else:
-                    flash("Invalid credentials.", 'error')
-            except Exception as e:
-                print(f"Database error: {e}")
-                flash("Error occurred during login.", 'error')
-    
-    return render_template('admin_login.html')
-
-@bp.route('/admin/update_profile', methods=['GET', 'POST'])
-def update_admin_profile():
-    
-    if 'admin_id' not in session:
-        return redirect(url_for('admin.admin_login'))
-    
-    admin_id = session.get('admin_id')
-    conn = get_db_connection()
-
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        new_password = request.form['new_password']
-        email = request.form['email']
-        file = request.files.get('profile_pic')
-
-        try:
-            cur = conn.cursor()
-            
-            # Check current password if new password is being updated
-            if new_password:
-                cur.execute("SELECT password FROM admin WHERE id = %s", (admin_id,))
-                current_password_hash = cur.fetchone()[0]
-                
-                if not check_password_hash(current_password_hash, password):
-                    flash('Current password is incorrect.', 'error')
-                else:
-                    hashed_password = generate_password_hash(new_password)
-                    cur.execute("""
-                        UPDATE admin
-                        SET password = %s
-                        WHERE id = %s
-                    """, (hashed_password, admin_id))
-                    conn.commit()
-
-            # Update username and email if provided
-            if username:
                 cur.execute("""
-                    UPDATE admin
-                    SET username = %s
-                    WHERE id = %s
-                """, (username, admin_id))
-                conn.commit()
+                    SELECT owner_id, status FROM businesses WHERE id = %s
+                """, (business_id,))
+                business = cur.fetchone()
                 
-            if email:
-                cur.execute("""
-                    UPDATE admin
-                    SET email = %s
-                    WHERE id = %s
-                """, (email, admin_id))
-                conn.commit()
-            
-            # Check if the admin wants to update the profile picture
-            if file and file.filename:
-                profile_pic_url = upload_file(file)
-                if profile_pic_url:
-                    cur.execute("""
-                        UPDATE admin
-                        SET profile_pic = %s
-                        WHERE id = %s
-                    """, (profile_pic_url, admin_id))
-                    conn.commit()
-                    session['admin_profile_pic'] = profile_pic_url
-
-
-            flash('Profile updated successfully.', 'success')
-            cur.close()
-        except Exception as e:
-            flash(f"Database error: {e}", 'error')
- 
-
-    # Fetch current admin data
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM admin WHERE id = %s", (admin_id,))
-    admin = cur.fetchone()
-    cur.close()
-    conn.close()
-
-    return render_template('admin_update_profile.html', admin=admin)
-
-@bp.route('/admin@bp.', methods=['GET'])
-def admin_profile():
-    if 'admin_logged_in' not in session:
-        return redirect(url_for('admin.admin_login'))
-    
-    admin_id = session.get('admin_id')
-    conn = get_db_connection()
-
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM admin WHERE id = %s", (admin_id,))
-        admin = cur.fetchone()
-        cur.close()
-    except Exception as e:
-        flash(f"Database error: {e}", 'error')
-    finally:
-        conn.close()
-
-    if admin:
-        return render_template('admin_profile.html', admin=admin)
-    else:
-        flash('Admin profile not found.', 'error')
-        return redirect(url_for('admin.admin_login'))
-
-@bp.route('/admin_dashboard')
-def admin_dashboard():
-    
-    if 'admin_logged_in' not in session or "admin_id" not in session:
-        return redirect(url_for('admin.admin_login'))
-
-    conn = get_db_connection()
-    user_requests = []
-    business_requests = []
-    users = []
-    claim_requests = []
-    pending_user_registration_request_count = 0
-    pending_business_registration_requests_count = 0
-    pending_approved_user_count = 0
-    pending_claim_requests_count = 0  # New variable for claim requests count
-
-    if conn:
-        try:
-            cur = conn.cursor(buffered=True)
-            
-            # Fetch pending claim requests
-            cur.execute("""
-                SELECT cr.id, b.business_name, u.username, cr.phone_number, cr.email, cr.category, cr.description, cr.created_at
-                FROM claim_requests cr
-                JOIN businesses b ON cr.business_id = b.id
-                JOIN users u ON cr.user_id = u.id
-                WHERE cr.reviewed = FALSE
-            """)
-            claim_requests = cur.fetchall()
-            
-            # Count pending claim requests
-            cur.execute("SELECT COUNT(*) FROM claim_requests WHERE reviewed = FALSE")
-            pending_claim_requests_count = cur.fetchone()[0]
-
-            # Fetch admin profile picture URL
-            admin_id = session.get('admin_id')
-            cur.execute("SELECT profile_pic FROM admin WHERE id = %s", (admin_id,))
-            
-            # Fetch all user registration requests
-            cur.execute("SELECT * FROM user_registration_requests")
-            user_requests = cur.fetchall()
-            
-            # Fetch all business registration requests
-            cur.execute("SELECT * FROM business_registration_requests")
-            business_requests = cur.fetchall()
-            
-            # Fetch all users
-            cur.execute("SELECT * FROM users")
-            users = cur.fetchall()
-
-            # Count pending user registration requests
-            cur.execute("SELECT COUNT(*) FROM user_registration_requests WHERE processed = FALSE")
-            pending_user_registration_request_count = cur.fetchone()[0]
-            
-            # Count pending business registration requests
-            cur.execute("SELECT COUNT(*) FROM business_registration_requests WHERE processed = FALSE")
-            pending_business_registration_requests_count = cur.fetchone()[0]
-            
-            # Count unapproved users
-            cur.execute("SELECT COUNT(*) FROM users WHERE is_approved = FALSE")
-            pending_approved_user_count = cur.fetchone()[0]
-            
-            cur.close()
-            conn.close()
-        except Exception as e:
-            print(f"Database error: {e}")
-            flash("Error occurred during dashboard retrieval.", 'error')
-        finally:
-            conn.close()
-
-    return render_template(
-        'admin_dashboard.html', 
-        user_requests=user_requests, 
-        business_requests=business_requests,  
-        users=users, 
-        pending_user_registration_request_count=pending_user_registration_request_count,
-        pending_business_registration_requests_count=pending_business_registration_requests_count,
-        pending_approved_user_count=pending_approved_user_count,
-    #    profile_pic_path=profile_pic_path,
-        claim_requests=claim_requests,
-        pending_claim_requests_count=pending_claim_requests_count)  # Pass count to template
-
-# 
-
-@bp.route('/process_user_registration', methods=['POST'])
-def process_user_registration():
-    if 'admin_logged_in' not in session:
-        return redirect(url_for('admin.admin_login'))
-
-    username = request.form['username']
-    email = request.form['email']
-    password = request.form['password']
-    name = request.form['name']
-    phone = request.form['phone']
-
-    conn = get_db_connection()
-    if conn:
-        try:
-            cur = conn.cursor()
-
-            # Check if the user already exists
-            cur.execute(
-                "SELECT COUNT(*) FROM users WHERE username = %s OR email = %s",
-                (username, email)
-            )
-            user_exists = cur.fetchone()[0] > 0
-
-            if not user_exists:
-                # Insert the new user into the users table
-                cur.execute(
-                    "INSERT INTO users (username, email, password, name, phone, is_admin, is_approved) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                    (username, email, password, name, phone, False, False)
-                )
+                if not business:
+                    flash('Business not found', 'error')
+                    return redirect(url_for('user.profile'))
                 
-            # Mark the user registration request as processed
-            cur.execute(
-                "UPDATE user_registration_requests SET processed = TRUE WHERE username = %s",
-                (username,)
-            )
-
-            conn.commit()
-            flash('User registered successfully.', 'success')
-
-        except Exception as e:
-            print(f"Database error: {e}")
-            flash('Error processing user registration.', 'error')
-        finally:
-            cur.close()
-            conn.close()
-
-    return redirect(url_for('admin.admin_dashboard'))
-
-
-@bp.route('/approve_user', methods=['POST'])
-def approve_user():
-    if 'admin_logged_in' not in session:
-        return redirect(url_for('admin.admin_login'))
-
-    username = request.form['username']
-
-    conn = get_db_connection()
-    if conn:
-        try:
-            cur = conn.cursor(buffered=True)
-
-            # Get the user's email and registration request ID from user_registration_requests
-            cur.execute("SELECT id, email FROM user_registration_requests WHERE username = %s", (username,))
-            registration_request = cur.fetchone()
-
-            if registration_request:
-                registration_request_id = registration_request[0]
-                email = registration_request[1]
-
-                # # Create the activation token
-                token = serializer.dumps(email, salt='email-activate')
+                if session['user_id'] != business[0] and session.get('role') != 'admin':
+                    flash('You do not have permission to access this resource', 'error')
+                    return redirect(url_for('user.profile'))
                 
-                # # Send activation email
-                # activation_url = url_for('activate_account', token=token, _external=True)
-                # msg = Message('Activate Your Account', sender='Dunistech Codersrich@gmail.com', recipients=[email])
-                # msg.body = f"Please click the link to activate your account: {activation_url}"
-                # mail.send(msg)
-
-                # Update the user to set is_approved to TRUE, is_activated to FALSE, and associate registration_request_id
-                cur.execute("""
-                    UPDATE users 
-                    SET is_approved = TRUE, is_activated = TRUE, activation_token = %s, registration_request_id = %s 
-                    WHERE username = %s
-                """, (token, registration_request_id, username))
-                
-                conn.commit()
-                
-                # Notify the admin that an email has been sent
-                flash(f'User approved. Activation email sent to {email}.', 'success')
-            else:
-                flash('User registration request not found.', 'error')
-                
-        except Exception as e:
-            traceback.print_exc()
-            flash(f'Database error: {e}', 'error')
-        finally:
-            cur.close()
-            conn.close()
-
-    return redirect(url_for('admin.admin_dashboard'))
-
-@bp.route('/activate_account/<token>')
-def activate_account(token):
-    try:
-        email = s.loads(token, salt='email-activate', max_age=3600)  # Token expires after 1 hour
-    except SignatureExpired:
-        flash('The activation link has expired.', 'error')
-        return redirect(url_for('index.home'))
-    except BadSignature:
-        flash('The activation link is invalid.', 'error')
-        return redirect(url_for('index.home'))
-
-    conn = get_db_connection()
-    if conn:
-        try:
-            cur = conn.cursor()
-            # Update the user's activation status
-            cur.execute("UPDATE users SET is_activated = TRUE WHERE email = %s", (email,))
-            conn.commit()
-            flash('Account activated successfully. You can now log in.', 'success')
-        except Exception as e:
-            print(f"Database error: {e}")
-            flash('Error activating account.', 'error')
-        finally:
-            cur.close()
-            conn.close()
-
-    return redirect(url_for('auth.user_login'))
-
-@bp.route('/admin/users')
-def admin_users():
-    if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
-        return redirect(url_for('auth.user_login'))
-    
-    conn = get_db_connection()
-    users = []
-    user_requests = []
-    business_requests = []
-    pending_user_registration_request_count = 0
-    pending_business_registration_requests_count = 0
-    pending_approved_user_count = 0
-    
-    if conn:
-        try:
-            cur = conn.cursor()
-            admin_id = session.get('admin_id')
-             # Fetch admin profile picture URL
-            cur.execute("SELECT profile_pic FROM admin WHERE id = %s", (admin_id,))
-            profile_pic_path = cur.fetchone()[0]
-            
-            cur.execute("SELECT id, username, email, is_admin, is_approved, suspended FROM users")
-            users = cur.fetchall()
-            
-            # Fetch all user registration requests
-            cur.execute("SELECT * FROM user_registration_requests")
-            user_requests = cur.fetchall()
-            
-            # Fetch all business registration requests
-            cur.execute("SELECT * FROM business_registration_requests")
-            business_requests = cur.fetchall()
-            
-            # Fetch all users
-            cur.execute("SELECT * FROM users")
-            users = cur.fetchall()
-
-            # Count pending user registration requests
-            cur.execute("SELECT COUNT(*) FROM user_registration_requests WHERE processed = FALSE")
-            pending_user_registration_request_count = cur.fetchone()[0]
-            
-            # Count pending business registration requests
-            cur.execute("SELECT COUNT(*) FROM business_registration_requests WHERE processed = FALSE")
-            pending_business_registration_requests_count = cur.fetchone()[0]
-            
-            # Count unapproved users
-            cur.execute("SELECT COUNT(*) FROM users WHERE is_approved = FALSE")
-            pending_approved_user_count = cur.fetchone()[0]
-            cur.close()
-        except Exception as e:
-            flash(f"Database error: {e}", 'error')
-        finally:
-            conn.close()
-    
-    return render_template('admin_users.html', users=users, user_requests=user_requests, 
-                           business_requests=business_requests,  
-                           pending_user_registration_request_count=pending_user_registration_request_count,
-                           pending_business_registration_requests_count=pending_business_registration_requests_count,
-                           pending_approved_user_count=pending_approved_user_count, profile_pic_path=profile_pic_path)
-    
-
-@bp.route('/admin/suspend_user/<int:user_id>')
-def suspend_user(user_id):
-    if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
-        return redirect(url_for('auth.user_login'))
-    
-    conn = get_db_connection()
-    if conn:
-        try:
-            cur = conn.cursor()
-            cur.execute("UPDATE users SET suspended = TRUE WHERE id = %s", (user_id,))
-            conn.commit()
-            cur.close()
-            flash("User account suspended.", 'success')
-        except Exception as e:
-            flash(f"Database error: {e}", 'error')
-        finally:
-            conn.close()
-    
-    return redirect(url_for('admin.admin_users'))
-
-@bp.route('/admin/unsuspend_user/<int:user_id>')
-def unsuspend_user(user_id):
-    if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
-        return redirect(url_for('auth.user_login'))
-    
-    conn = get_db_connection()
-    if conn:
-        try:
-            cur = conn.cursor()
-            cur.execute("UPDATE users SET suspended = FALSE WHERE id = %s", (user_id,))
-            conn.commit()
-            cur.close()
-            flash("User account unsuspended.", 'success')
-        except Exception as e:
-            flash(f"Database error: {e}", 'error')
-        finally:
-            conn.close()
-    
-    return redirect(url_for('admin.admin_users'))
-
-@bp.route('/admin/delete_user/<int:user_id>', methods=['POST'])
-def delete_user(user_id):
-    try:
-        if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
-            return redirect(url_for('auth.user_login'))
-
-        conn = get_db_connection()
-        if conn:
-            try:
-                cur = conn.cursor()
-
-                # Fetch the registration_request_id
-                cur.execute("SELECT registration_request_id FROM users WHERE id = %s", (user_id,))
-                registration_request_id = cur.fetchone()
-
-                # Delete related claim requests
-                cur.execute("DELETE FROM claim_requests WHERE user_id = %s", (user_id,))
-
-                # Delete the user
-                cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
-
-                # Manually delete the related registration request if the cascade didn't work
-                if registration_request_id and registration_request_id[0]:
-                    # print("registration_request_id --", registration_request_id, registration_request_id[0])
-                    cur.execute("DELETE FROM user_registration_requests WHERE id = %s", (registration_request_id[0],))
-
-                conn.commit()
-                cur.close()
-                flash('User and associated data deleted successfully.', 'success')
-            except Exception as e:
-                traceback.print_exc()
-                flash(f"Database error: {e}", 'error')
+                return f(*args, **kwargs)
             finally:
-                conn.close()
+                if conn:
+                    conn.close()
+        return decorated_function
+    return decorator
 
-        return redirect(url_for('admin.admin_users'))
-    except Exception as e:
-        return f"{e}"
+def upload_file(file):
+    """Handle file uploads and return properly formatted full web URL"""
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        upload_folder = app.config['UPLOAD_FOLDER']
+        os.makedirs(upload_folder, exist_ok=True)
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+        base_url = request.host_url.rstrip('/')
+        static_path = f"/static/uploads/{filename}"
+        return f"{base_url}{static_path}"
+    return None
 
-@bp.route('/admin/user/<int:user_id>/businesses')
-def view_user_businesses(user_id):
-    
-    if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
-        return redirect(url_for('auth.user_login'))
-    
-    conn = get_db_connection()
-    businesses = []
-    user_name = None
+# ======================
+# USER ROUTES (EXISTING)
+# ======================
+# ... [Keep all existing user routes exactly as they are] ...
 
-    if conn:
-        try:
-            cur = conn.cursor()
-            admin_id = session.get('admin_id')
-             # Fetch admin profile picture URL
-            cur.execute("SELECT profile_pic FROM admin WHERE id = %s", (admin_id,))
-            profile_pic_path = cur.fetchone()[0]
-            
-            # Query to fetch businesses along with the owner's username
-            cur.execute("""
-                SELECT b.id, b.business_name, b.shop_no, b.phone_number, b.description, b.is_subscribed, b.email, u.username
-                FROM businesses b
-                JOIN users u ON b.owner_id = u.id
-                WHERE b.owner_id = %s
-            """, (user_id,))
-            
-            businesses = cur.fetchall()
-            
-            # Extract the username from one of the fetched businesses (assuming all have the same owner)
-            if businesses:
-                user_name = businesses[0][7]  # Assuming the username is at index 7 in the result
-            
-            cur.close()
-        except Exception as e:
-            flash(f"Database error: {e}", 'error')
-        finally:
-            conn.close()
+# ======================
+# ADMIN ROUTES (NEW)
+# ======================
 
-    return render_template('admin_user_businesses.html', businesses=businesses, user_id=user_id, user_name=user_name, profile_pic_path=profile_pic_path)
-
-
-@bp.route('/admin/business/<int:business_id>/update', methods=['GET', 'POST'])
-def update_business(business_id):
-    if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
-        return redirect(url_for('auth.user_login'))
-    
-    conn = get_db_connection()
-    user_id = None
-
-    if request.method == 'POST':
-        business_name = request.form['business_name']
-        shop_no = request.form['shop_no']
-        phone_number = request.form['phone_number']
-        description = request.form['description']
-        email = request.form['email']
-        category = request.form['category']
-        is_subscribed = request.form.get('is_subscribed') == 'on'
-
-        try:
-            cur = conn.cursor()
-            # Get the user_id before updating the business
-            cur.execute("SELECT owner_id FROM businesses WHERE id = %s", (business_id,))
-            user_id = cur.fetchone()[0]
-
-            # Update the business details
-            cur.execute("""
-                UPDATE businesses
-                SET business_name = %s, shop_no = %s, phone_number = %s, description = %s, email = %s, is_subscribed = %s, category = %s
-                WHERE id = %s
-            """, (business_name, shop_no, phone_number, description, email, is_subscribed, category, business_id))
-            conn.commit()
-            flash('Business updated successfully.', 'success')
-            cur.close()
-        except Exception as e:
-            flash(f"Database error: {e}", 'error')
-        finally:
-            conn.close()
-
-        # Redirect to the user's business view route, passing the user_id
-        # return redirect(url_for(request.referrer))
-        return redirect(url_for('business.businesses'))
-    
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM businesses WHERE id = %s", (business_id,))
-    business = cur.fetchone()
-    user_id = business[1]  # Assuming owner_id is the second column in the businesses table
-    cur.close()
-    conn.close()
-
-    if business:
-        return render_template('admin_update_business.html', business=business)
-    else:
-        flash('Business not found.', 'error')
-        return redirect(url_for('admin.view_user_businesses', user_id=user_id))
-
-
-@bp.route('/admin/business/<int:business_id>/delete', methods=['POST', 'GET'])
-def delete_business(business_id):
-    if 'admin_logged_in' not in session or not session.get('admin_logged_in'):
-        return redirect(url_for('auth.user_login'))
-    
+@bp.route('/dashboard')
+@admin_required
+def dashboard():
+    """Admin dashboard with system overview"""
     conn = get_db_connection()
     try:
-        cur = conn.cursor()
+        cur = conn.cursor(dictionary=True)
         
-        # Delete related claim requests
-        cur.execute("DELETE FROM claim_requests WHERE business_id = %s", (business_id,))
+        # Get system statistics
+        cur.execute("""
+            SELECT 
+                (SELECT COUNT(*) FROM users) as total_users,
+                (SELECT COUNT(*) FROM businesses) as total_businesses,
+                (SELECT COUNT(*) FROM businesses WHERE status = 'active') as active_businesses,
+                (SELECT COUNT(*) FROM businesses WHERE status = 'pending') as pending_businesses,
+                (SELECT COUNT(*) FROM businesses WHERE status = 'suspended') as suspended_businesses,
+                (SELECT COUNT(*) FROM businesses WHERE is_subscribed = TRUE) as subscribed_businesses
+        """)
+        stats = cur.fetchone()
+        
+        # Get recent activities
+        cur.execute("""
+            SELECT a.*, u.username as actor_name 
+            FROM admin_activities a
+            JOIN users u ON a.admin_id = u.id
+            ORDER BY a.created_at DESC
+            LIMIT 10
+        """)
+        activities = cur.fetchall()
+        
+        return render_template('admin_dashboard.html', 
+                             stats=stats,
+                             activities=activities)
+    except Exception as e:
+        flash(f'Error loading dashboard: {str(e)}', 'error')
+        return redirect(url_for('admin.dashboard'))
+    finally:
+        if conn:
+            conn.close()
 
+@bp.route('/users')
+@admin_required
+def manage_users():
+    """List all users with management options"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute("""
+            SELECT u.*, 
+                   COUNT(b.id) as business_count,
+                   CASE WHEN u.role = 'admin' THEN 'Admin'
+                        WHEN u.role = 'owner' THEN 'Business Owner'
+                        ELSE 'Regular User' END as role_display
+            FROM users u
+            LEFT JOIN businesses b ON u.id = b.owner_id
+            GROUP BY u.id
+            ORDER BY u.created_at DESC
+        """)
+        users = cur.fetchall()
+        return render_template('admin_users.html', users=users)
+    except Exception as e:
+        flash(f'Error loading users: {str(e)}', 'error')
+        return redirect(url_for('admin.dashboard'))
+    finally:
+        if conn:
+            conn.close()
+
+@bp.route('/users/<int:user_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_user(user_id):
+    """Edit user details and role"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
         
-        # Delete business data from related tables first
+        if request.method == 'POST':
+            # Handle form submission
+            username = request.form.get('username')
+            email = request.form.get('email')
+            role = request.form.get('role')
+            is_active = request.form.get('is_active') == 'on'
+            
+            cur.execute("""
+                UPDATE users 
+                SET username = %s, email = %s, role = %s, is_active = %s
+                WHERE id = %s
+                RETURNING *
+            """, (username, email, role, is_active, user_id))
+            updated_user = cur.fetchone()
+            conn.commit()
+            
+            # Log admin activity
+            cur.execute("""
+                INSERT INTO admin_activities (admin_id, action, details)
+                VALUES (%s, 'user_update', %s)
+            """, (session['user_id'], f"Updated user {updated_user['username']} (ID: {user_id})"))
+            conn.commit()
+            
+            flash('User updated successfully', 'success')
+            return redirect(url_for('admin.manage_users'))
+        
+        # GET request - load user data
+        cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        
+        if not user:
+            flash('User not found', 'error')
+            return redirect(url_for('admin.manage_users'))
+            
+        return render_template('admin_edit_user.html', user=user)
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error updating user: {str(e)}', 'error')
+        return redirect(url_for('admin.manage_users'))
+    finally:
+        if conn:
+            conn.close()
+
+@bp.route('/businesses')
+@admin_required
+def manage_businesses():
+    """List all businesses with management options"""
+    conn = get_db_connection()
+    try:
+        status_filter = request.args.get('status', 'all')
+        
+        base_query = """
+            SELECT b.*, 
+                   u.username as owner_name,
+                   CASE 
+                       WHEN b.status = 'active' THEN 'Active'
+                       WHEN b.status = 'pending' THEN 'Pending Approval'
+                       WHEN b.status = 'suspended' THEN 'Suspended'
+                       ELSE b.status
+                   END as status_display
+            FROM businesses b
+            JOIN users u ON b.owner_id = u.id
+        """
+        
+        params = []
+        if status_filter != 'all':
+            base_query += " WHERE b.status = %s"
+            params.append(status_filter)
+            
+        base_query += " ORDER BY b.created_at DESC"
+        
+        cur = conn.cursor(dictionary=True)
+        cur.execute(base_query, params)
+        businesses = cur.fetchall()
+        
+        return render_template('admin_businesses.html', 
+                            businesses=businesses,
+                            current_filter=status_filter)
+    except Exception as e:
+        flash(f'Error loading businesses: {str(e)}', 'error')
+        return redirect(url_for('admin.dashboard'))
+    finally:
+        if conn:
+            conn.close()
+
+@bp.route('/businesses/<int:business_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_business(business_id):
+    """Edit business details as admin"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        if request.method == 'POST':
+            # Handle form submission
+            business_name = request.form.get('business_name')
+            description = request.form.get('description')
+            status = request.form.get('status')
+            is_verified = request.form.get('is_verified') == 'on'
+            is_subscribed = request.form.get('is_subscribed') == 'on'
+            
+            cur.execute("""
+                UPDATE businesses 
+                SET business_name = %s, description = %s, 
+                    status = %s, is_verified = %s, is_subscribed = %s
+                WHERE id = %s
+                RETURNING *
+            """, (business_name, description, status, is_verified, is_subscribed, business_id))
+            updated_business = cur.fetchone()
+            conn.commit()
+            
+            # Log admin activity
+            cur.execute("""
+                INSERT INTO admin_activities (admin_id, action, details)
+                VALUES (%s, 'business_update', %s)
+            """, (session['user_id'], f"Updated business {updated_business['business_name']} (ID: {business_id})"))
+            conn.commit()
+            
+            flash('Business updated successfully', 'success')
+            return redirect(url_for('admin.manage_businesses'))
+        
+        # GET request - load business data
+        cur.execute("""
+            SELECT b.*, u.username as owner_name
+            FROM businesses b
+            JOIN users u ON b.owner_id = u.id
+            WHERE b.id = %s
+        """, (business_id,))
+        business = cur.fetchone()
+        
+        if not business:
+            flash('Business not found', 'error')
+            return redirect(url_for('admin.manage_businesses'))
+            
+        return render_template('admin_edit_business.html', business=business)
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error updating business: {str(e)}', 'error')
+        return redirect(url_for('admin.manage_businesses'))
+    finally:
+        if conn:
+            conn.close()
+
+@bp.route('/businesses/<int:business_id>/assign', methods=['GET', 'POST'])
+@admin_required
+def assign_business(business_id):
+    """Assign business to a different owner"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        if request.method == 'POST':
+            new_owner_id = request.form.get('owner_id')
+            
+            # Verify new owner exists and is a business owner
+            cur.execute("SELECT id, username FROM users WHERE id = %s AND role = 'owner'", (new_owner_id,))
+            new_owner = cur.fetchone()
+            
+            if not new_owner:
+                flash('Invalid owner selected', 'error')
+                return redirect(url_for('admin.assign_business', business_id=business_id))
+            
+            # Get current business details for logging
+            cur.execute("SELECT business_name, owner_id FROM businesses WHERE id = %s", (business_id,))
+            business = cur.fetchone()
+            
+            if not business:
+                flash('Business not found', 'error')
+                return redirect(url_for('admin.manage_businesses'))
+            
+            # Update ownership
+            cur.execute("""
+                UPDATE businesses 
+                SET owner_id = %s
+                WHERE id = %s
+                RETURNING *
+            """, (new_owner_id, business_id))
+            conn.commit()
+            
+            # Log admin activity
+            cur.execute("""
+                INSERT INTO admin_activities (admin_id, action, details)
+                VALUES (%s, 'business_reassign', %s)
+            """, (session['user_id'], 
+                 f"Reassigned business {business['business_name']} from user {business['owner_id']} to {new_owner_id}"))
+            conn.commit()
+            
+            flash(f'Business successfully assigned to {new_owner["username"]}', 'success')
+            return redirect(url_for('admin.manage_businesses'))
+        
+        # GET request - load form
+        cur.execute("SELECT id, username FROM users WHERE role = 'owner' ORDER BY username")
+        owners = cur.fetchall()
+        
+        cur.execute("""
+            SELECT b.id, b.business_name, u.id as owner_id, u.username as owner_name
+            FROM businesses b
+            JOIN users u ON b.owner_id = u.id
+            WHERE b.id = %s
+        """, (business_id,))
+        business = cur.fetchone()
+        
+        if not business:
+            flash('Business not found', 'error')
+            return redirect(url_for('admin.manage_businesses'))
+            
+        return render_template('admin_assign_business.html', 
+                             business=business,
+                             owners=owners)
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error assigning business: {str(e)}', 'error')
+        return redirect(url_for('admin.manage_businesses'))
+    finally:
+        if conn:
+            conn.close()
+
+@bp.route('/businesses/<int:business_id>/verify', methods=['POST'])
+@admin_required
+def verify_business(business_id):
+    """Verify a business as legitimate"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        # Get business name for logging
+        cur.execute("SELECT business_name FROM businesses WHERE id = %s", (business_id,))
+        business = cur.fetchone()
+        
+        if not business:
+            flash('Business not found', 'error')
+            return redirect(url_for('admin.manage_businesses'))
+        
+        # Update verification status
+        cur.execute("""
+            UPDATE businesses 
+            SET is_verified = TRUE
+            WHERE id = %s
+        """, (business_id,))
+        conn.commit()
+        
+        # Log admin activity
+        cur.execute("""
+            INSERT INTO admin_activities (admin_id, action, details)
+            VALUES (%s, 'business_verify', %s)
+        """, (session['user_id'], f"Verified business {business['business_name']} (ID: {business_id})"))
+        conn.commit()
+        
+        flash('Business successfully verified', 'success')
+        return redirect(url_for('admin.manage_businesses'))
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error verifying business: {str(e)}', 'error')
+        return redirect(url_for('admin.manage_businesses'))
+    finally:
+        if conn:
+            conn.close()
+
+@bp.route('/businesses/<int:business_id>/suspend', methods=['POST'])
+@admin_required
+def suspend_business(business_id):
+    """Suspend a business account"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        # Get business name for logging
+        cur.execute("SELECT business_name FROM businesses WHERE id = %s", (business_id,))
+        business = cur.fetchone()
+        
+        if not business:
+            flash('Business not found', 'error')
+            return redirect(url_for('admin.manage_businesses'))
+        
+        # Update status to suspended
+        cur.execute("""
+            UPDATE businesses 
+            SET status = 'suspended'
+            WHERE id = %s
+        """, (business_id,))
+        conn.commit()
+        
+        # Log admin activity
+        cur.execute("""
+            INSERT INTO admin_activities (admin_id, action, details)
+            VALUES (%s, 'business_suspend', %s)
+        """, (session['user_id'], f"Suspended business {business['business_name']} (ID: {business_id})"))
+        conn.commit()
+        
+        flash('Business successfully suspended', 'success')
+        return redirect(url_for('admin.manage_businesses'))
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error suspending business: {str(e)}', 'error')
+        return redirect(url_for('admin.manage_businesses'))
+    finally:
+        if conn:
+            conn.close()
+
+@bp.route('/businesses/<int:business_id>/activate', methods=['POST'])
+@admin_required
+def activate_business(business_id):
+    """Activate a suspended business"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        # Get business name for logging
+        cur.execute("SELECT business_name FROM businesses WHERE id = %s", (business_id,))
+        business = cur.fetchone()
+        
+        if not business:
+            flash('Business not found', 'error')
+            return redirect(url_for('admin.manage_businesses'))
+        
+        # Update status to active
+        cur.execute("""
+            UPDATE businesses 
+            SET status = 'active'
+            WHERE id = %s
+        """, (business_id,))
+        conn.commit()
+        
+        # Log admin activity
+        cur.execute("""
+            INSERT INTO admin_activities (admin_id, action, details)
+            VALUES (%s, 'business_activate', %s)
+        """, (session['user_id'], f"Activated business {business['business_name']} (ID: {business_id})"))
+        conn.commit()
+        
+        flash('Business successfully activated', 'success')
+        return redirect(url_for('admin.manage_businesses'))
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error activating business: {str(e)}', 'error')
+        return redirect(url_for('admin.manage_businesses'))
+    finally:
+        if conn:
+            conn.close()
+
+@bp.route('/businesses/<int:business_id>/delete', methods=['POST'])
+@admin_required
+def delete_business(business_id):
+    """Permanently delete a business"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        # Get business name for logging
+        cur.execute("SELECT business_name FROM businesses WHERE id = %s", (business_id,))
+        business = cur.fetchone()
+        
+        if not business:
+            flash('Business not found', 'error')
+            return redirect(url_for('admin.manage_businesses'))
+        
+        # Delete business categories first
         cur.execute("DELETE FROM business_categories WHERE business_id = %s", (business_id,))
         
-        # Optionally, delete the business registration request
-        cur.execute("DELETE FROM business_registration_requests WHERE business_name = (SELECT business_name FROM businesses WHERE id = %s)", (business_id,))
-        
-        # Finally, delete the business
+        # Then delete the business
         cur.execute("DELETE FROM businesses WHERE id = %s", (business_id,))
-        
         conn.commit()
-        flash('Business and related registration request deleted successfully.', 'success')
+        
+        # Log admin activity
+        cur.execute("""
+            INSERT INTO admin_activities (admin_id, action, details)
+            VALUES (%s, 'business_delete', %s)
+        """, (session['user_id'], f"Deleted business {business['business_name']} (ID: {business_id})"))
+        conn.commit()
+        
+        flash('Business successfully deleted', 'success')
+        return redirect(url_for('admin.manage_businesses'))
     except Exception as e:
-        flash(f"Database error: {e}", 'error')
-        print(f"Database error: {e}")
+        conn.rollback()
+        flash(f'Error deleting business: {str(e)}', 'error')
+        return redirect(url_for('admin.manage_businesses'))
     finally:
-        cur.close()
-        conn.close()
-    
-    return redirect(url_for('business.businesses'))
+        if conn:
+            conn.close()
 
-## Delete from Users and user_registration_requests Table ##
-@bp.route("/delete/<int:id_number>")
-def delete(id_number):
-    # we use this syntax <int:id_number> to get an interger or number, NOTE: the int is required,
-    #but the id_number can be name anything
-    
-    connection = get_db_connection()
-    mycusor = connection.cursor()
-    mycusor.execute('DELETE FROM user_form WHERE id = %s', (id_number,))
-    
-    connection.commit()
-    mycusor.close()
-    connection.close()
-    
-    return redirect(url_for('fetch'))
-## Delete from Users and user_registration_requests Table 
+# ======================
+# BUSINESS MEDIA PROTECTION
+# ======================
+
+@bp.route('/business/<int:business_id>/update_media', methods=['POST'])
+# @owner_or_admin_required(business_id)
+def update_business_media(business_id):
+    """Update business media (protected route)"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        # Check if business is subscribed (admin bypasses this check)
+        if session.get('role') != 'admin':
+            cur.execute("SELECT is_subscribed FROM businesses WHERE id = %s", (business_id,))
+            business = cur.fetchone()
+            
+            if not business or not business['is_subscribed']:
+                flash('Only subscribed businesses can update their media', 'error')
+                return redirect(url_for('user.business_profile', business_id=business_id))
+        
+        # Handle file upload
+        file = request.files.get('business_media')
+        if file and file.filename:
+            file_path = upload_file(file)
+            if file_path:
+                cur.execute("""
+                    UPDATE businesses 
+                    SET media_url = %s, media_type = 'image'
+                    WHERE id = %s
+                """, (file_path, business_id))
+                conn.commit()
+                flash('Business media updated successfully!', 'success')
+        
+        return redirect(url_for('user.business_profile', business_id=business_id))
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error updating media: {str(e)}', 'error')
+        return redirect(url_for('user.business_profile', business_id=business_id))
+    finally:
+        if conn:
+            conn.close()

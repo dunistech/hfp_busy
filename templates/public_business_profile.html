@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Business Header -->
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <div class="business-media-container shadow-sm rounded">
+                {% if business.media_type and business.media_url %}
+                    {% if business.media_type == 'image' %}
+                    <img src="{{ business.media_url }}" 
+                         class="img-fluid rounded" 
+                         alt="{{ business.business_name }}">
+                    {% else %}
+                    <video class="img-fluid rounded" controls>
+                        <source src="{{ business.media_url }}" type="video/mp4">
+                        Your browser doesn't support videos
+                    </video>
+                    {% endif %}
+                {% else %}
+                <div class="placeholder-media d-flex align-items-center justify-content-center h-100 bg-light">
+                    <i class="fas fa-store fa-5x text-muted"></i>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="mb-1">{{ business.business_name }}</h1>
+                    {% if business.categories %}
+                    <div class="mb-3">
+                        {% for category in business.categories.split(', ') %}
+                        <span class="badge bg-primary me-1">{{ category }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-4">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                            <span>{{ business.block_num }} | Shop {{ business.shop_no }}</span>
+                        </div>
+                        {% if business.is_subscribed %}
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-crown me-1"></i> Premium Business
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if is_owner %}
+                <a href="{{ url_for('user.business_profile', business_id=business.id) }}" 
+                   class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i> Manage
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="business-contact mb-4">
+                <h5 class="mb-3"><i class="fas fa-address-card me-2"></i> Contact</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1"><i class="fas fa-phone-alt me-2 text-primary"></i> 
+                        <a href="tel:{{ business.phone_number }}">{{ business.phone_number }}</a></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-1"><i class="fas fa-envelope me-2 text-primary"></i> 
+                        <a href="mailto:{{ business.email }}">{{ business.email }}</a></p>
+                    </div>
+                </div>
+                
+                {% if business.website_url or business.facebook_link or business.instagram_link %}
+                <div class="social-links mt-3">
+                    {% if business.website_url %}
+                    <a href="{{ business.website_url }}" target="_blank" class="btn btn-outline-secondary btn-sm me-2">
+                        <i class="fas fa-globe me-1"></i> Website
+                    </a>
+                    {% endif %}
+                    {% if business.facebook_link %}
+                    <a href="{{ business.facebook_link }}" target="_blank" class="btn btn-outline-primary btn-sm me-2">
+                        <i class="fab fa-facebook-f me-1"></i> Facebook
+                    </a>
+                    {% endif %}
+                    {% if business.instagram_link %}
+                    <a href="{{ business.instagram_link }}" target="_blank" class="btn btn-outline-danger btn-sm me-2">
+                        <i class="fab fa-instagram me-1"></i> Instagram
+                    </a>
+                    {% endif %}
+                    {% if business.twitter_link %}
+                    <a href="{{ business.twitter_link }}" target="_blank" class="btn btn-outline-info btn-sm me-2">
+                        <i class="fab fa-twitter me-1"></i> Twitter
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Business Details -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> About</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ business.description or "No description provided." }}</p>
+                    
+                    {% if business.opening_hours %}
+                    <div class="mt-4">
+                        <h6><i class="fas fa-clock me-2"></i> Opening Hours</h6>
+                        <p class="mb-0">{{ business.opening_hours }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Map Section -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i> Location</h5>
+                </div>
+                <div class="card-body p-0" style="height: 300px;">
+                    <div id="businessMap" class="h-100 w-100">
+                        <!-- Map will be rendered here with JavaScript -->
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">
+                        <i class="fas fa-map-marker-alt text-danger me-1"></i> 
+                        {{ business.address or 'Address not specified' }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Owner Info (if available) -->
+            {% if business.owner_username %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i> Business Owner</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-user-circle fa-3x text-muted"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">{{ business.owner_username }}</h6>
+                            <small class="text-muted">Registered Business Owner</small>
+                        </div>
+                    </div>
+                    {% if not is_owner %}
+                    <div class="mt-3">
+                        <a href="#" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fas fa-envelope me-1"></i> Contact Owner
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Similar Businesses -->
+            {% if similar_businesses %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-store me-2"></i> Similar Businesses</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for biz in similar_businesses %}
+                        <a href="{{ url_for('business.public_business_profile', business_id=biz.id) }}" 
+                           class="list-group-item list-group-item-action">
+                            <div class="d-flex align-items-center">
+                                {% if biz.media_url %}
+                                <img src="{{ biz.media_url }}" 
+                                     class="rounded me-3" 
+                                     width="50" 
+                                     height="50"
+                                     style="object-fit: cover;"
+                                     alt="{{ biz.business_name }}">
+                                {% else %}
+                                <div class="rounded bg-light me-3 d-flex align-items-center justify-content-center" 
+                                     style="width:50px;height:50px">
+                                    <i class="fas fa-store text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-0">{{ biz.business_name }}</h6>
+                                    <small class="text-muted">View profile</small>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Map JavaScript -->
+<script>
+// Initialize map (example using Leaflet.js)
+function initMap() {
+    // You'll need to implement actual geocoding/map functionality
+    const map = L.map('businessMap').setView([51.505, -0.09], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Add marker (you would geocode the address)
+    L.marker([51.5, -0.09]).addTo(map)
+        .bindPopup('{{ business.business_name }}')
+        .openPopup();
+}
+
+document.addEventListener('DOMContentLoaded', initMap);
+</script>
+
+<!-- Include Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<style>
+.business-media-container {
+    height: 300px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+}
+
+.placeholder-media {
+    height: 100%;
+    color: #6c757d;
+}
+
+#businessMap {
+    min-height: 300px;
+}
+
+.social-links .btn {
+    min-width: 110px;
+}
+</style>
+{% endblock %}

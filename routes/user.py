@@ -806,6 +806,7 @@ def public_business_profile(business_id):
         
     except Exception as e:
         app.logger.error(f"Error loading business profile: {str(e)}")
+        traceback.print_exception(e)
         flash('Error loading business profile', 'error')
         return redirect(url_for('index.home'))
     finally:

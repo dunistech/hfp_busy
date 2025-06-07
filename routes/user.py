@@ -292,6 +292,53 @@ def admin_users():
         if conn:
             conn.close()
 
+
+@bp.route('/admin/user/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_user(user_id):
+    """Delete a user account (admin only)"""
+    if user_id == session['user_id']:
+        flash('You cannot delete your own account', 'error')
+        return redirect(url_for('user.admin_users'))
+
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        # Get user info for confirmation message
+        cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        
+        if not user:
+            flash('User not found', 'error')
+            return redirect(url_for('user.admin_users'))
+        
+        # Check if user owns any businesses
+        cur.execute("SELECT COUNT(*) as business_count FROM businesses WHERE owner_id = %s", (user_id,))
+        result = cur.fetchone()
+        
+        if result['business_count'] > 0:
+            flash('Cannot delete user - they own businesses. Reassign businesses first.', 'error')
+            return redirect(url_for('user.admin_users'))
+        
+        # Delete user
+        cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        conn.commit()
+        
+        flash(f'User "{user["username"]}" has been deleted', 'success')
+        return redirect(url_for('user.admin_users'))
+        
+    except Exception as e:
+        conn.rollback()
+        traceback.print_exc()
+        flash(f'Error deleting user: {str(e)}', 'error')
+        return redirect(url_for('user.admin_users'))
+    finally:
+        if conn:
+            conn.close()
+
+
+
 @bp.route('/admin/business/<int:business_id>/update_status', methods=['POST'])
 @admin_required
 def admin_update_business_status(business_id):
@@ -1071,6 +1118,164 @@ def delete_business(business_id):
 
     return redirect(request.referrer)
 
+
+# # Assign a business to a user.
+# @bp.route('/admin/business/<int:business_id>/assign', methods=['GET', 'POST'])
+# @admin_required
+# def admin_assign_business(business_id):
+#     """Assign business to a different owner"""
+#     conn = get_db_connection()
+#     try:
+#         cur = conn.cursor(dictionary=True)
+        
+#         if request.method == 'POST':
+#             new_owner_id = request.form.get('owner_id')
+            
+#             # Verify new owner exists
+#             cur.execute("SELECT id, username FROM users WHERE id = %s", (new_owner_id,))
+#             new_owner = cur.fetchone()
+            
+#             if not new_owner:
+#                 flash('Invalid owner selected', 'error')
+#                 return redirect(url_for('user.admin_assign_business', business_id=business_id))
+            
+#             # Get current business details
+#             cur.execute("SELECT business_name, owner_id FROM businesses WHERE id = %s", (business_id,))
+#             business = cur.fetchone()
+#             print(business)
+#             if not business:
+#                 flash('Business not found', 'error')
+#                 return redirect(url_for('user.admin_businesses'))
+            
+#             # Update ownership
+#             cur.execute("""
+#                 UPDATE businesses 
+#                 SET owner_id = %s
+#                 WHERE id = %s
+#             """, (new_owner_id, business_id))
+            
+#             conn.commit()
+#             flash(f'Business "{business["business_name"]}" assigned to {new_owner["username"]}', 'success')
+#             return redirect(url_for('user.admin_businesses'))
+        
+#         # GET request - load form
+#         # Get current business info
+#         cur.execute("""
+#             SELECT b.id, b.business_name, u.id as owner_id, u.username as owner_name
+#             FROM businesses b
+#             JOIN users u ON b.owner_id = u.id
+#             WHERE b.id = %s
+#         """, (business_id,))
+#         business = cur.fetchone()
+        
+#         if not business:
+#             flash('Business not found', 'error')
+#             return redirect(url_for('user.admin_businesses'))
+            
+#         # Get all potential owners (users with owner or admin role)
+#         cur.execute("""
+#             SELECT id, username, email 
+#             FROM users 
+#             WHERE role IN ('owner', 'admin')
+#             ORDER BY username
+#         """)
+#         owners = cur.fetchall()
+        
+#         return render_template('admin_assign_business.html', 
+#                              business=business,
+#                              owners=owners)
+#     except Exception as e:
+#         conn.rollback()
+#         traceback.print_exception(e)
+#         flash(f'Error assigning business: {str(e)}', 'error')
+#         return redirect(url_for('user.admin_businesses'))
+#     finally:
+#         if conn:
+#             conn.close()
+
+# 
+@bp.route('/admin/business/<int:business_id>/assign', methods=['GET', 'POST'])
+@admin_required
+def admin_assign_business(business_id):
+    """Assign business to a different owner"""
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        
+        # First verify business exists
+        cur.execute("SELECT id, business_name FROM businesses WHERE id = %s", (business_id,))
+        business = cur.fetchone()
+        
+        if not business:
+            flash(f'Business with ID {business_id} not found', 'error')
+            return redirect(url_for('user.admin_businesses'))
+        
+        print(f"Found business: {business}")  # Debug print
+        
+        if request.method == 'POST':
+            new_owner_id = request.form.get('owner_id')
+            
+            if not new_owner_id:
+                flash('No owner selected', 'error')
+                return redirect(url_for('user.admin_assign_business', business_id=business_id))
+            
+            # Verify new owner exists
+            cur.execute("SELECT id, username FROM users WHERE id = %s", (new_owner_id,))
+            new_owner = cur.fetchone()
+            
+            if not new_owner:
+                flash('Invalid owner selected', 'error')
+                return redirect(url_for('user.admin_assign_business', business_id=business_id))
+            
+            print(f"Assigning business {business_id} to user {new_owner_id}")  # Debug print
+            
+            # Update ownership
+            cur.execute("""
+                UPDATE businesses 
+                SET owner_id = %s
+                WHERE id = %s
+            """, (new_owner_id, business_id))
+            
+            conn.commit()
+            flash(f'Business "{business["business_name"]}" assigned to {new_owner["username"]}', 'success')
+            return redirect(url_for('user.admin_businesses'))
+        
+        # GET request - load form
+        # Get current owner info
+        cur.execute("""
+            SELECT u.id, u.username
+            FROM users u
+            JOIN businesses b ON b.owner_id = u.id
+            WHERE b.id = %s
+        """, (business_id,))
+        current_owner = cur.fetchone()
+        
+        # Get all potential owners (users with owner or admin role)
+        cur.execute("""
+            SELECT id, username, email 
+            FROM users 
+            WHERE role IN ('owner', 'admin')
+            ORDER BY username
+        """)
+        owners = cur.fetchall()
+        
+        return render_template('admin_assign_business.html', 
+                            business={
+                                'id': business_id,
+                                'name': business['business_name'],
+                                'current_owner': current_owner
+                            },
+                            owners=owners)
+        
+    except Exception as e:
+        conn.rollback()
+        app.logger.error(f"Error in admin_assign_business: {str(e)}")
+        traceback.print_exc()
+        flash(f'Error assigning business: {str(e)}', 'error')
+        return redirect(url_for('user.admin_businesses'))
+    finally:
+        if conn:
+            conn.close()
 
 
 

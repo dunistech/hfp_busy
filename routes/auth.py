@@ -262,7 +262,7 @@ def register():
                     return redirect(url_for('auth.register'))
 
                 # Create verification token
-                verification_token = generate_secure_token()
+                verification_token = generate_token(email)
                 token_expires = datetime.now() + timedelta(hours=24)
 
                 # Insert new user
@@ -270,16 +270,18 @@ def register():
                     INSERT INTO users (
                         username, 
                         email, 
+                        phone,
                         password, 
                         verification_token,
                         token_expires_at,
                         role,
                         created_at,
                         updated_at
-                    ) VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
                 """, (
                     username,
                     email,
+                    phone,
                     generate_password_hash(password),
                     verification_token,
                     token_expires,
@@ -289,7 +291,7 @@ def register():
                 conn.commit()
 
                 # Send verification email
-                send_verification_email(email, verification_token)
+                send_verification_email(app, email, verification_token)
                 
                 
                 flash('Registration successful! Please check your email to verify your account.', 'success')
@@ -567,7 +569,7 @@ def forgot_password():
         conn.close()
 
         if user:
-            token = generate_token(user['id'])
+            token = generate_token(user['email'])
             # print(f"Generated token: {token}")  # Debugging line
             # send_reset_email(email, token)  # Ensure this function is defined correctly
             send_reset_email(app, email, token)

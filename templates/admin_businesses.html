@@ -63,6 +63,12 @@
                                         <i class="fas fa-ellipsis-h"></i>
                                     </button>
                                     <ul class="dropdown-menu">
+                                        <!-- Add this to the dropdown menu in the actions column -->
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('user.admin_assign_business', business_id=business.id) }}">
+                                                    <i class="fas fa-user-tie me-2"></i>Change Owner
+                                                </a>
+                                            </li>
                                         <li>
                                             <a class="dropdown-item" href="{{ url_for('user.business_profile', business_id=business.id) }}">
                                                 <i class="fas fa-eye me-2"></i>View

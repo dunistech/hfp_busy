@@ -69,10 +69,50 @@
                                                 </button>
                                             </form>
                                         </li>
+
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ user.id }}">
+                                                <i class="fas fa-trash-alt me-2"></i>Delete User
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </td>
                         </tr>
+                        <!-- Delete Modal for User {{ user.id }} -->
+<div class="modal fade" id="deleteUserModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirm User Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete user "{{ user.username }}"?</p>
+                {% if user.business_count > 0 %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    This user owns {{ user.business_count }} business(es). You must reassign these businesses before deletion.
+                </div>
+                {% else %}
+                <p class="text-danger"><strong>This action cannot be undone!</strong></p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                {% if user.business_count == 0 %}
+                <form method="POST" action="{{ url_for('user.admin_delete_user', user_id=user.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Delete Permanently
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
                         {% endfor %}
                     </tbody>
                 </table>
@@ -80,4 +120,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

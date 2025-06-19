@@ -2,10 +2,12 @@
 
 {% block content %}
 
+{% include 'hero.html' %}
 <!-- Carousel Start -->
-<div class="container-fluid p-0">
+{#<div class="container-fluid p-0">
     <div id="header-carousel" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
+
             <div class="carousel-item active">
                 <img class="w-100 hero-small" src="{{ url_for('static', filename='assets/img/hero-small1.png') }}"
                     alt="Image">
@@ -45,7 +47,7 @@
             </div>
         </a>
     </div>
-</div>
+</div>#}
 <!-- Carousel End -->
 
 <div class="container-fluid booking mt-5 pb-5">

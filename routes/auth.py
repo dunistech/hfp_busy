@@ -234,7 +234,7 @@ def verify_email2(token):
 @bp.route('/register', methods=['GET', 'POST'])  # Changed to match your template
 def register():
     if 'user_id' in session:
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('user.profile'))
 
     if request.method == 'POST':
         username = request.form.get('username').strip()

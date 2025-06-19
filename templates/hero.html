@@ -1,0 +1,84 @@
+<!-- Carousel Start -->
+<div class="container-fluid p-0">
+  <div id="header-carousel" class="carousel slide" data-ride="carousel">
+    <div class="carousel-inner">
+
+      {% set slides = [
+        {
+          'image': 'assets/img/hero-small2.png', 
+          'title': 'Promote & Elevate Your Brand',
+          'btn_text': 'Get Started',
+          'btn_link': url_for('user.add_business')
+        },
+        {
+          'image': './img/hero/s.engr.jpg',
+          'title': '',
+          'btn_text': 'Explore',
+          'btn_link': "https://dunistech.ng/register" 
+        },
+        {
+          'image': './img/hero/summer_talent.jpg',
+          'title': '',
+          'btn_text': 'Explore Talents',
+          'btn_link': "https://dunistech.ng/summer2025" 
+        },
+        {
+          'image': './img/hero/summer_talent_0.jpg',
+          'title': '',
+          'btn_text': '',
+          'btn_link': "https://dunistech.ng/summer2025" 
+        },
+        {
+          'image': './img/hero/summer_talent_1.jpg',
+          'title': '',
+          'btn_text': '',
+          'btn_link': "https://dunistech.ng/summer2025" 
+        },
+        {
+          'image': './img/hero/summer_talent_2.jpg',
+          'title': '',
+          'btn_text': 'Learn More',
+          'btn_link': "https://dunistech.ng/summer2025" 
+        },
+      ] %}
+
+      {% for slide in slides %}
+      <a href="{{ slide.btn_link }}" class="carousel-item {% if loop.first %}active{% endif %}" style="text-decoration: none;">
+        <img src="{{ url_for('static', filename=slide.image) }}"
+             class="w-100 d-block" alt="Slide Image"
+             style="object-fit: cover; height: 70vh;">
+
+        {% if slide.title or slide.btn_text %}
+        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+          <div class="p-3 text-center" style="max-width: 900px;">
+            {% if slide.title %}
+              <h1 class="display-4 text-white mb-4">{{ slide.title }}</h1>
+            {% endif %}
+            {% if slide.btn_text %}
+              <div class="btn py-3 px-5 btn-lg rounded"
+                   style="background-color: #040450; color: white; display: inline-block;">
+                {{ slide.btn_text }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </a>
+      {% endfor %}
+
+    </div>
+
+    <a class="carousel-control-prev" href="#header-carousel" data-slide="prev">
+      <div class="btn btn-dark d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+        <span class="carousel-control-prev-icon"></span>
+      </div>
+    </a>
+    <a class="carousel-control-next" href="#header-carousel" data-slide="next">
+      <div class="btn btn-dark d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+        <span class="carousel-control-next-icon"></span>
+      </div>
+    </a>
+  </div>
+</div>
+<!-- Carousel End -->
+

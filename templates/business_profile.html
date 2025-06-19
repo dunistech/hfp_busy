@@ -206,7 +206,7 @@
                                 <small class="text-muted">Verified businesses appear more trustworthy to customers.</small>
                             </form>
 
-                            <h6 class="mb-3">Subscription Management</h6>
+                            {#<!--<h6 class="mb-3">Subscription Management</h6>
                             <form method="POST" action="{{ url_for('admin.update_business_subscription', business_id=business.id) }}">
                                 <div class="input-group mb-3">
                                     <select class="form-select" name="subscription_plan">
@@ -220,7 +220,39 @@
                                         <i class="fas fa-save me-1"></i> Update Plan
                                     </button>
                                 </div>
-                            </form>
+                            </form>-->#}
+                            <h6 class="mb-3">Subscription Management</h6>
+
+<!-- Toggle subscription status -->
+<form method="POST" action="{{ url_for('admin.update_business_subscription', business_id=business.id) }}" class="mb-3">
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch"
+               id="subscriptionToggle" name="is_subscribed"
+               {{ 'checked' if business.is_subscribed }} onchange="this.form.submit()">
+        <label class="form-check-label" for="subscriptionToggle">
+            Premium Subscription
+        </label>
+    </div>
+    <input type="hidden" name="action" value="toggle_subscription">
+</form>
+
+<!-- Update subscription plan -->
+<form method="POST" action="{{ url_for('admin.update_business_subscription', business_id=business.id) }}">
+    <div class="input-group mb-3">
+        <select class="form-select" name="subscription_plan">
+            {% for plan in subscription_plans %}
+            <option value="{{ plan.id }}" {{ 'selected' if business.subscription_plan_id == plan.id }}>
+                {{ plan.plan_name }} (₦{{ plan.amount }}/{{ plan.duration }})
+            </option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-admin-primary" type="submit">
+            <i class="fas fa-save me-1"></i> Update Plan
+        </button>
+    </div>
+</form>
+
+
                         </div>
                     </div>
 

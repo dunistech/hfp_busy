@@ -1547,11 +1547,11 @@ def update_business_status(business_id):
 
         if not business:
             flash('Business not found.', 'error')
-            return redirect(url_for('user.profile'))
+            return redirect(request.referrer)
 
         if not is_admin and business['owner_id'] != user_id:
             flash('You do not have permission to update this business.', 'danger')
-            return redirect(url_for('user.profile'))
+            return redirect(request.referrer)
 
         # Update status
         cur.execute("""
@@ -1570,6 +1570,62 @@ def update_business_status(business_id):
         conn.close()
 
     return redirect(request.referrer or url_for('user.profile'))
+
+# BUSINESS SUBSCRIPTION STATUS UPDATES:
+@bp.route('/business/<int:business_id>/subscription', methods=['POST'])
+# @admin_required_v2(allowed_roles=['superadmin', 'admin' 'billing_admin'])  # Restrict to certain admins
+@admin_required
+def update_business_subscription(business_id):
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+
+        # Ensure the business exists
+        cur.execute("SELECT * FROM businesses WHERE id = %s", (business_id,))
+        business = cur.fetchone()
+        if not business:
+            flash('Business not found.', 'error')
+            return redirect(request.referrer)
+
+        action = request.form.get("action")
+
+        # Toggle subscription
+        if action == "toggle_subscription":
+            is_subscribed = 'is_subscribed' in request.form
+            cur.execute("""
+                UPDATE businesses 
+                SET is_subscribed = %s 
+                WHERE id = %s
+            """, (is_subscribed, business_id))
+            conn.commit()
+            flash('Subscription status updated.', 'success')
+
+        # Update subscription plan
+        elif action == "update_plan":
+            subscription_plan_id = request.form.get('subscription_plan')
+            if not subscription_plan_id or not subscription_plan_id.isdigit():
+                flash('Invalid subscription plan selected.', 'error')
+                return redirect(url_for('user.business_profile', business_id=business_id))
+
+            cur.execute("""
+                UPDATE subscriptions 
+                SET plan_id = %s, business_id= %s
+                WHERE id = %s
+            """, (int(subscription_plan_id), business_id))
+            conn.commit()
+            flash('Subscription plan updated.', 'success')
+
+        else:
+            flash('Invalid action.', 'error')
+
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error updating subscription: {str(e)}', 'error')
+
+    finally:
+        conn.close()
+
+    return redirect(request.referrer)
 
 # 
 # import os

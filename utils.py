@@ -26,7 +26,25 @@ def role_required(role):
         return decorated_function
     return decorator
 
-    
+   
+# admin role decorator
+from functools import wraps
+from flask import session, redirect, url_for, flash
+
+def admin_required(allowed_roles=None):
+    allowed_roles = allowed_roles or ['admin']  # Default role if none provided
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            user_role = session.get('role')
+            if user_role not in allowed_roles:
+                flash('You do not have permission to access this resource.', 'danger')
+                return redirect(url_for('admin.dashboard'))
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+ 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS

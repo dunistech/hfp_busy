@@ -141,18 +141,18 @@
                                            value="{{ business.category }}" required>
                                 </div>#}
                                 <!-- With this multi-select dropdown -->
-<div class="col-md-6 mb-3">
-    <label for="categories" class="form-label">Categories*</label>
-    <select class="form-select" id="categories" name="categories" multiple required>
-        {% for category in all_categories %}
-        <option value="{{ category.id }}" 
-                {% if category.id in business_category_ids %}selected{% endif %}>
-            {{ category.category_name }}
-        </option>
-        {% endfor %}
-    </select>
-    <div class="form-text">Hold Ctrl/Cmd to select multiple categories</div>
-</div>
+                        <div class="col-md-6 mb-3">
+                            <label for="categories" class="form-label">Categories*</label>
+                            <select class="form-select" id="categories" name="categories" multiple required>
+                                {% for category in all_categories %}
+                                <option value="{{ category.id }}" 
+                                        {% if category.id in business_category_ids %}selected{% endif %}>
+                                    {{ category.category_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Hold Ctrl/Cmd to select multiple categories</div>
+                        </div>
 
                             </div>
                             
@@ -267,12 +267,14 @@
             </div>
 
             <!-- Subscription Section -->
+             
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
                     <h4 class="mb-0"><i class="fas fa-crown me-2"></i>Subscription & Status</h4>
                 </div>
                 <div class="card-body">
-                    {% if business.is_subscribed and business.status != 'suspended'%}
+
+                    {% if business.is_subscribed and business.status != 'suspended' %}
                     <div class="alert alert-success">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -282,6 +284,7 @@
                             <span class="badge {{'bg-success' if business.status != 'suspended' else 'bg-warning'}}">{{business.status}}</span>
                         </div>
                     </div>
+
                     {% else %}
                     <div class="alert alert-warning">
                         <div class="d-flex justify-content-between align-items-center">
@@ -318,6 +321,7 @@
                             </div>
                         </div>
                         {% endfor %}
+                        
                     </div>
                 </div>
             </div>
@@ -343,7 +347,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="mb-3">
+                    {#<div class="mb-3">
                         <h5>Change Status</h5>
                         <div class="btn-group w-100" role="group">
                             <form method="POST" action="{{ url_for('user.update_business_status', business_id=business.id) }}" class="w-100">
@@ -360,8 +364,83 @@
                                     <i class="fas fa-pause me-1"></i> Suspend
                                 </button>
                             </form>
+
+                            <!-- Subscription Toggle Switch -->
+                            <form method="POST" action="{{ url_for('user.update_business_subscription', business_id=business.id) }}" class="mb-3">
+                                <div class="form-check form-switch border-primarys">
+                                    <input type="hidden" name="action" value="toggle_subscription">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                        id="subscriptionToggle" name="is_subscribed"
+                                        {{ 'checked' if business.is_subscribed }} onchange="this.form.submit()"
+                                        {{ 'disabled' if business.status == 'suspended' }}>
+                                    <label class="form-check-label" for="subscriptionToggle">
+                                        Activate Subscription
+                                    </label>
+                                </div>
+                            </form>
                         </div>
-                    </div>
+                    </div>#}
+
+                    <div class="mb-4">
+    <h5 class="mb-3">Business Controls</h5>
+
+    <!-- Status Buttons -->
+    <div class="btn-group w-100 mb-3" role="group" aria-label="Change Status">
+        <!-- Set Active -->
+        <form method="POST" action="{{ url_for('user.update_business_status', business_id=business.id) }}">
+            <input type="hidden" name="status" value="active">
+            <button type="submit"
+                    class="btn btn-outline-success {{ 'active' if business.status == 'active' }}"
+                    {{ 'disabled' if business.status == 'active' }}>
+                <i class="fas fa-check me-1"></i> Set Active
+            </button>
+        </form>
+
+        <!-- Suspend -->
+        <form method="POST" action="{{ url_for('user.update_business_status', business_id=business.id) }}">
+            <input type="hidden" name="status" value="suspended">
+            <button type="submit"
+                    class="btn btn-outline-warning {{ 'active' if business.status == 'suspended' }}"
+                    {{ 'disabled' if business.status == 'suspended' }}>
+                <i class="fas fa-pause me-1"></i> Suspend
+            </button>
+        </form>
+    </div>
+
+    <!-- Subscription Toggle -->
+    <form method="POST" action="{{ url_for('user.update_business_subscription', business_id=business.id) }}">
+
+
+        <input type="hidden" name="action" value="toggle_subscription">
+
+        <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch"
+           id="subscriptionToggle" name="is_subscribed"
+           {{ 'checked' if business.is_subscribed }}
+           onchange="this.form.submit()"
+           {{ 'disabled' if business.status == 'suspended' }}>
+        <label class="form-check-label" for="subscriptionToggle">Activate Subscription</label>
+        </div>
+
+       {# <div class="form-check form-switch ps-0">
+            <div class="border rounded p-2 d-flex  align-items-center justify-content-between">
+                <div class="border rounded p-2 d-flex align-items-center justify-content-between">
+    <label class="form-check-label m-0 me-7 fw-semibold" for="subscriptionToggle">
+        Activate Subscription
+    </label>
+
+    <input class="form-check-input ms-3" type="checkbox" role="switch"
+           id="subscriptionToggle" name="is_subscribed"
+           {{ 'checked' if business.is_subscribed }}
+           onchange="this.form.submit()"
+           {{ 'disabled' if business.status == 'suspended' }}>
+</div>#}
+
+            </div>
+        </div>
+    </form>
+</div>
+
 
                     <div class="alert alert-danger mt-4">
                         <h5><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>

@@ -1324,16 +1324,65 @@ def admin_assign_business(business_id):
 #     return redirect(request.referrer)
 
 # 
+# @bp.route('/update_business_status/<int:business_id>', methods=['POST'])
+# def update_business_status(business_id):
+#     """Update business status (for admin and user actions)"""
+#     if 'user_id' not in session:
+#         flash('Please log in to perform this action.', 'error')
+#         return redirect(url_for('auth.login'))
+
+#     user_id = session['user_id']
+#     new_status = request.form.get('status')
+    
+#     if not new_status or new_status not in ['active', 'suspended', 'pending']:
+#         flash('Invalid status provided.', 'error')
+#         return redirect(url_for('user.profile'))
+
+#     conn = get_db_connection()
+#     try:
+#         cur = conn.cursor(dictionary=True)
+        
+#         # First get the business name
+#         cur.execute("""
+#             SELECT business_name FROM businesses 
+#             WHERE id = %s AND owner_id = %s
+#         """, (business_id, user_id))
+#         business = cur.fetchone()
+        
+#         if not business:
+#             flash('Business not found or you do not have permission.', 'error')
+#             flash('Business not found or you do not have permission.', 'danger')
+#             return redirect(url_for('user.profile'))
+        
+#         # Update the status
+#         cur.execute("""
+#             UPDATE businesses 
+#             SET status = %s
+#             WHERE id = %s AND owner_id = %s
+#         """, (new_status, business_id, user_id))
+        
+#         conn.commit()
+#         flash(f'Business "{business["business_name"]}" status updated to {new_status}.', 'success')
+        
+#     except Exception as e:
+#         conn.rollback()
+#         flash(f'Error updating status: {str(e)}', 'error')
+#     finally:
+#         if conn:
+#             conn.close()
+    
+#     return redirect(request.referrer)
+
 @bp.route('/update_business_status/<int:business_id>', methods=['POST'])
 def update_business_status(business_id):
-    """Update business status (for admin and user actions)"""
+    """Update business status (admin or business owner only)"""
     if 'user_id' not in session:
         flash('Please log in to perform this action.', 'error')
         return redirect(url_for('auth.login'))
 
     user_id = session['user_id']
     new_status = request.form.get('status')
-    
+
     if not new_status or new_status not in ['active', 'suspended', 'pending']:
         flash('Invalid status provided.', 'error')
         return redirect(url_for('user.profile'))
@@ -1341,37 +1390,41 @@ def update_business_status(business_id):
     conn = get_db_connection()
     try:
         cur = conn.cursor(dictionary=True)
-        
-        # First get the business name
-        cur.execute("""
-            SELECT business_name FROM businesses 
-            WHERE id = %s AND owner_id = %s
-        """, (business_id, user_id))
+
+        # Get user role
+        cur.execute("SELECT role FROM users WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        is_admin = user and user['role'] == 'admin'
+
+        # Get the business and check access permission
+        cur.execute("SELECT business_name, owner_id FROM businesses WHERE id = %s", (business_id,))
         business = cur.fetchone()
-        
+
         if not business:
-            flash('Business not found or you do not have permission.', 'error')
+            flash('Business not found.', 'error')
             return redirect(url_for('user.profile'))
-        
-        # Update the status
+
+        if not is_admin and business['owner_id'] != user_id:
+            flash('You do not have permission to update this business.', 'danger')
+            return redirect(url_for('user.profile'))
+
+        # Update status
         cur.execute("""
             UPDATE businesses 
-            SET status = %s
-            WHERE id = %s AND owner_id = %s
-        """, (new_status, business_id, user_id))
-        
+            SET status = %s 
+            WHERE id = %s
+        """, (new_status, business_id))
         conn.commit()
+
         flash(f'Business "{business["business_name"]}" status updated to {new_status}.', 'success')
-        
+
     except Exception as e:
         conn.rollback()
         flash(f'Error updating status: {str(e)}', 'error')
     finally:
-        if conn:
-            conn.close()
-    
-    return redirect(request.referrer)
+        conn.close()
 
+    return redirect(request.referrer or url_for('user.profile'))
 
 # 
 # import os

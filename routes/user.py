@@ -615,9 +615,147 @@ def admin_update_user_role(user_id):
 #     return render_template('business_profile_0.html', **context)
 # 
 
+# @bp.route('/business/<int:business_id>', methods=['GET', 'POST'])
+# def business_profile(business_id):
+#     """Manage individual business profile"""
+#     if 'user_id' not in session:
+#         flash('Please log in to access this page.', 'error')
+#         return redirect(url_for('auth.login'))
+
+#     user_id = session['user_id']
+#     conn = get_db_connection()
+#     business = None
+#     subscription_plans = []
+#     all_categories = []
+#     business_categories = []
+#     business_category_ids = []
+
+#     if conn:
+#         try:
+#             cur = conn.cursor(dictionary=True)
+            
+#             # Verify ownership and get business details
+#             cur.execute("""
+#                 SELECT b.*, 
+#                        CASE 
+#                            WHEN b.status = 'active' THEN 'Active'
+#                            WHEN b.status = 'pending' THEN 'Pending Approval'
+#                            WHEN b.status = 'suspended' THEN 'Suspended'
+#                            ELSE b.status
+#                        END as status_display
+#                 FROM businesses b
+#                 WHERE b.id = %s AND b.owner_id = %s
+#             """, (business_id, user_id))
+#             business = cur.fetchone()
+
+#             if not business:
+#                 flash('Business not found or you do not have permission.', 'error')
+#                 return redirect(url_for('user.profile'))
+
+#             # Get all available categories
+#             cur.execute("SELECT id, category_name FROM categories ORDER BY category_name")
+#             all_categories = cur.fetchall()
+
+#             # Get business's current categories
+#             cur.execute("""
+#                 SELECT c.id, c.category_name 
+#                 FROM business_categories bc
+#                 JOIN categories c ON bc.category_id = c.id
+#                 WHERE bc.business_id = %s
+#             """, (business_id,))
+#             business_categories = cur.fetchall()
+#             business_category_ids = [cat['id'] for cat in business_categories]
+
+#             # Handle form submission for business updates
+#             if request.method == 'POST':
+#                 business_name = request.form.get('business_name')
+#                 description = request.form.get('description')
+#                 phone_number = request.form.get('phone_number')
+#                 email = request.form.get('email')
+#                 shop_no = request.form.get('shop_no')
+#                 block_num = request.form.get('block_num')  # Fixed typo: was bloc_num
+#                 address = request.form.get('address')
+#                 facebook = request.form.get('facebook_link')
+#                 instagram = request.form.get('instagram_link')
+#                 twitter = request.form.get('twitter_link')
+#                 website = request.form.get('website_url')
+#                 file = request.files.get('business_media')
+#                 selected_category_ids = request.form.getlist('categories')
+
+#                 # Update business details
+#                 update_fields = {
+#                     'business_name': business_name,
+#                     'description': description,
+#                     'phone_number': phone_number,
+#                     'email': email,
+#                     'shop_no': shop_no,
+#                     'block_num': block_num,
+#                     'address': address,
+#                     'facebook_link': facebook,
+#                     'instagram_link': instagram,
+#                     'twitter_link': twitter,
+#                     'website_url': website
+#                 }
+
+#                 # Handle media upload
+#                 if file and file.filename:
+#                     file_path = upload_file(file)
+#                     if file_path:
+#                         update_fields['media_url'] = file_path
+#                         update_fields['media_type'] = 'image'  # Default to image
+
+#                 # Build and execute update query
+#                 set_clause = ', '.join([f"{k} = %s" for k in update_fields])
+#                 values = list(update_fields.values()) + [business_id, user_id]
+                
+#                 cur.execute(f"""
+#                     UPDATE businesses 
+#                     SET {set_clause}
+#                     WHERE id = %s AND owner_id = %s
+#                 """, values)
+                
+#                 # Update categories relationship
+#                 # First, delete existing relationships
+#                 cur.execute("DELETE FROM business_categories WHERE business_id = %s", (business_id,))
+
+#                 # Then add the new ones
+#                 for cat_id in selected_category_ids:
+#                     if cat_id:  # Ensure category ID is not empty
+#                         cur.execute("""
+#                             INSERT INTO business_categories (business_id, category_id)
+#                             VALUES (%s, %s)
+#                         """, (business_id, cat_id))
+
+#                 conn.commit()
+#                 flash('Business updated successfully!', 'success')
+#                 return redirect(url_for('user.business_profile', business_id=business_id))
+
+#             # Get subscription plans
+#             cur.execute("SELECT * FROM subscription_plans ORDER BY amount ASC")
+#             subscription_plans = cur.fetchall()
+
+#         except Exception as e:
+#             conn.rollback()
+#             traceback.print_exc()  # Better for debugging than print_exception
+#             flash(f'Error updating business: {str(e)}', 'error')
+#         finally:
+#             if conn:
+#                 conn.close()
+
+#     context = {
+#         "business": business,
+#         "subscription_plans": subscription_plans,
+#         "all_categories": all_categories,
+#         "business_categories": business_categories,
+#         "business_category_ids": business_category_ids
+#     }
+
+#     return render_template('business_profile_0.html', **context)
+
+# UPDATED ON 6/19/2025 AROUND 4:11PM
 @bp.route('/business/<int:business_id>', methods=['GET', 'POST'])
 def business_profile(business_id):
-    """Manage individual business profile"""
+    """Manage individual business profile (admin or owner access only)"""
     if 'user_id' not in session:
         flash('Please log in to access this page.', 'error')
         return redirect(url_for('auth.login'))
@@ -633,8 +771,13 @@ def business_profile(business_id):
     if conn:
         try:
             cur = conn.cursor(dictionary=True)
-            
-            # Verify ownership and get business details
+
+            # Get user role
+            cur.execute("SELECT role FROM users WHERE id = %s", (user_id,))
+            user = cur.fetchone()
+            is_admin = user and user['role'] == 'admin'
+
+            # Get business and check access
             cur.execute("""
                 SELECT b.*, 
                        CASE 
@@ -644,12 +787,16 @@ def business_profile(business_id):
                            ELSE b.status
                        END as status_display
                 FROM businesses b
-                WHERE b.id = %s AND b.owner_id = %s
-            """, (business_id, user_id))
+                WHERE b.id = %s
+            """, (business_id,))
             business = cur.fetchone()
 
             if not business:
-                flash('Business not found or you do not have permission.', 'danger')
+                flash('Business not found.', 'error')
+                return redirect(url_for('user.profile'))
+
+            if not is_admin and business['owner_id'] != user_id:
+                flash('You do not have permission to access this business.', 'danger')
                 return redirect(url_for('user.profile'))
 
             # Get all available categories
@@ -673,7 +820,7 @@ def business_profile(business_id):
                 phone_number = request.form.get('phone_number')
                 email = request.form.get('email')
                 shop_no = request.form.get('shop_no')
-                block_num = request.form.get('block_num')  # Fixed typo: was bloc_num
+                block_num = request.form.get('block_num')
                 address = request.form.get('address')
                 facebook = request.form.get('facebook_link')
                 instagram = request.form.get('instagram_link')
@@ -682,7 +829,6 @@ def business_profile(business_id):
                 file = request.files.get('business_media')
                 selected_category_ids = request.form.getlist('categories')
 
-                # Update business details
                 update_fields = {
                     'business_name': business_name,
                     'description': description,
@@ -702,25 +848,25 @@ def business_profile(business_id):
                     file_path = upload_file(file)
                     if file_path:
                         update_fields['media_url'] = file_path
-                        update_fields['media_type'] = 'image'  # Default to image
+                        update_fields['media_type'] = 'image'
 
                 # Build and execute update query
                 set_clause = ', '.join([f"{k} = %s" for k in update_fields])
-                values = list(update_fields.values()) + [business_id, user_id]
-                
-                cur.execute(f"""
-                    UPDATE businesses 
-                    SET {set_clause}
-                    WHERE id = %s AND owner_id = %s
-                """, values)
-                
-                # Update categories relationship
-                # First, delete existing relationships
-                cur.execute("DELETE FROM business_categories WHERE business_id = %s", (business_id,))
+                values = list(update_fields.values()) + [business_id]
 
-                # Then add the new ones
+                # If not admin, enforce owner check
+                if not is_admin:
+                    update_sql = f"UPDATE businesses SET {set_clause} WHERE id = %s AND owner_id = %s"
+                    values.append(user_id)
+                else:
+                    update_sql = f"UPDATE businesses SET {set_clause} WHERE id = %s"
+
+                cur.execute(update_sql, values)
+
+                # Update business categories
+                cur.execute("DELETE FROM business_categories WHERE business_id = %s", (business_id,))
                 for cat_id in selected_category_ids:
-                    if cat_id:  # Ensure category ID is not empty
+                    if cat_id:
                         cur.execute("""
                             INSERT INTO business_categories (business_id, category_id)
                             VALUES (%s, %s)
@@ -730,17 +876,16 @@ def business_profile(business_id):
                 flash('Business updated successfully!', 'success')
                 return redirect(url_for('user.business_profile', business_id=business_id))
 
-            # Get subscription plans
+            # Load subscription plans
             cur.execute("SELECT * FROM subscription_plans ORDER BY amount ASC")
             subscription_plans = cur.fetchall()
 
         except Exception as e:
             conn.rollback()
-            traceback.print_exc()  # Better for debugging than print_exception
+            traceback.print_exc()
             flash(f'Error updating business: {str(e)}', 'error')
         finally:
-            if conn:
-                conn.close()
+            conn.close()
 
     context = {
         "business": business,

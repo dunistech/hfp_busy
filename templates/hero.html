@@ -1,6 +1,7 @@
+
 <!-- Carousel Start -->
-<div class="container-fluid p-0">
-  <div id="header-carousel" class="carousel slide" data-ride="carousel">
+<div class="container-fluid p-0" style="margin-top: 0;">
+  <div id="header-carousel" class="carousel slide" data-ride="carousel" style="margin-top: 0;">
     <div class="carousel-inner">
 
       {% set slides = [
@@ -8,42 +9,48 @@
           'image': 'assets/img/hero-small2.png', 
           'title': 'Promote & Elevate Your Brand',
           'btn_text': 'Get Started',
-          'btn_link': url_for('user.add_business')
+          'btn_link': url_for('user.add_business'),
+          'overlay': True
         },
         {
           'image': './img/hero/s.engr.jpg',
           'title': '',
           'btn_text': 'Explore',
-          'btn_link': "https://dunistech.ng/register" 
+          'btn_link': "https://dunistech.ng/trainingcohorts",
+          'overlay': False
         },
         {
           'image': './img/hero/summer_talent.jpg',
           'title': '',
           'btn_text': 'Explore Talents',
-          'btn_link': "https://dunistech.ng/summer2025" 
+          'btn_link': "https://dunistech.ng/summer2025",
+          'overlay': False
         },
         {
           'image': './img/hero/summer_talent_0.jpg',
           'title': '',
           'btn_text': '',
-          'btn_link': "https://dunistech.ng/summer2025" 
+          'btn_link': "https://dunistech.ng/summer2025",
+          'overlay': False
         },
         {
           'image': './img/hero/summer_talent_1.jpg',
           'title': '',
           'btn_text': '',
-          'btn_link': "https://dunistech.ng/summer2025" 
+          'btn_link': "https://dunistech.ng/summer2025",
+          'overlay': False
         },
         {
           'image': './img/hero/summer_talent_2.jpg',
           'title': '',
           'btn_text': 'Learn More',
-          'btn_link': "https://dunistech.ng/summer2025" 
+          'btn_link': "https://dunistech.ng/summer2025",
+          'overlay': False
         },
       ] %}
 
       {% for slide in slides %}
-      <a href="{{ slide.btn_link }}" class="carousel-item {% if loop.first %}active{% endif %}" style="text-decoration: none;">
+      <a href="{{ slide.btn_link }}" class="carousel-item {% if loop.first %}active{% endif %}" style="text-decoration: none; position: relative;">
         <img src="{{ url_for('static', filename=slide.image) }}"
              class="w-100 d-block" alt="Slide Image"
              style="object-fit: cover; height: 70vh;">
@@ -62,6 +69,11 @@
             {% endif %}
           </div>
         </div>
+        {% endif %}
+        
+        <!-- Overlay only for slides where overlay=true -->
+        {% if slide.overlay %}
+        <div class="carousel-overlay"></div>
         {% endif %}
       </a>
       {% endfor %}
@@ -82,3 +94,29 @@
 </div>
 <!-- Carousel End -->
 
+<style>
+  /* Overlay styling */
+  .carousel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .carousel-caption {
+
+background: none !important;
+
+}
+  /* Ensure carousel stays below navbar */
+  .sticky-top {
+    top: 0;
+  }
+  
+  /* Full-width navbar */
+  .navbar > .container-fluid {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+</style>

@@ -1,81 +1,8 @@
-import os
-import traceback
-from flask import Blueprint, current_app as app, request, render_template, redirect, session, url_for, flash
-from utils import allowed_file, get_db_connection
-from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
+from flask import Blueprint, request, render_template, redirect, session, url_for, flash
+from utils.helpers import get_db_connection, admin_required
 
 # bp = Blueprint('user', __name__)
 bp = Blueprint('admin', __name__, url_prefix='/admin')
-
-# ======================
-# HELPER FUNCTIONS
-# ======================
-
-def admin_required(f):
-    """Decorator to ensure user has admin privileges"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session or session.get('role') != 'admin':
-            flash('Administrator access required', 'error')
-            return redirect(url_for('auth.login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def owner_or_admin_required(business_id):
-    """Decorator factory to ensure user is owner or admin"""
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if 'user_id' not in session:
-                flash('Please log in to access this page.', 'error')
-                return redirect(url_for('auth.login'))
-            
-            conn = get_db_connection()
-            try:
-                cur = conn.cursor()
-                cur.execute("""
-                    SELECT owner_id, status FROM businesses WHERE id = %s
-                """, (business_id,))
-                business = cur.fetchone()
-                
-                if not business:
-                    flash('Business not found', 'error')
-                    return redirect(url_for('user.profile'))
-                
-                if session['user_id'] != business[0] and session.get('role') != 'admin':
-                    flash('You do not have permission to access this resource', 'error')
-                    return redirect(url_for('user.profile'))
-                
-                return f(*args, **kwargs)
-            finally:
-                if conn:
-                    conn.close()
-        return decorated_function
-    return decorator
-
-def upload_file(file):
-    """Handle file uploads and return properly formatted full web URL"""
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        upload_folder = app.config['UPLOAD_FOLDER']
-        os.makedirs(upload_folder, exist_ok=True)
-        file_path = os.path.join(upload_folder, filename)
-        file.save(file_path)
-        base_url = request.host_url.rstrip('/')
-        static_path = f"/static/uploads/{filename}"
-        return f"{base_url}{static_path}"
-    return None
-
-# ======================
-# USER ROUTES (EXISTING)
-# ======================
-# ... [Keep all existing user routes exactly as they are] ...
-
-# ======================
-# ADMIN ROUTES (NEW)
-# ======================
 
 @bp.route('/dashboard')
 @admin_required
@@ -532,9 +459,6 @@ def delete_business(business_id):
         if conn:
             conn.close()
 
-# ======================
-# BUSINESS MEDIA PROTECTION
-# ======================
 
 @bp.route('/business/<int:business_id>/update_media', methods=['POST'])
 # @owner_or_admin_required(business_id)

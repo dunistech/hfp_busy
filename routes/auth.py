@@ -1,13 +1,12 @@
 import traceback
-from flask import (current_app as app, Blueprint, jsonify, request, render_template, redirect, url_for, flash, session)
+from flask import (current_app as app, Blueprint, request, render_template, redirect, url_for, flash, session)
 from werkzeug.security import generate_password_hash, check_password_hash
-from utils import (generate_token, verify_token, send_verification_email, get_db_connection, send_reset_email, verify_reset_token)
+from utils.helpers import (generate_token, verify_token, get_db_connection, verify_reset_token)
+from utils.emails import (send_verification_email, send_reset_email)
 
 from markupsafe import Markup
 import re
 from datetime import datetime, timedelta
-import secrets
-import string
 
 bp = Blueprint('auth', __name__)
 
@@ -331,116 +330,6 @@ def validate_registration(username, email, password, phone):
 
     return errors
 
-### Routes for User and Business Registration ###
-# @bp.route('/register_user', methods=['GET', 'POST'])
-# def register_user():
-    
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         email = request.form['email']
-#         name = request.form['name']
-#         phone = request.form['phone']
-        
-#         """ ======= Business Related Info ============ """
-#         category = request.form['category']
-#         shop_no = request.form['shop_no']
-#         block_num = request.form['block_num']
-#         description = request.form['description']
-#         website_url = request.form['website_url']
-#         social_handles = request.form['social_handles']
-#         # user_id = session.get('user_id')
-        
-#         # 
-#         # Handle form submission and save data
-#         # phone = request.form.get('phone')
-#         # email = request.form.get('email')
-#         # website_url = request.form.get('website_url')
-#         # social_handles = request.form.get('social_handles')
-#         # description = request.form.get('description')
-#         # name = request.form.get('name')
-#         # shop_no = request.form.get('shop_no')
-#         # block_num = request.form.get('block_num')
-#         # category = request.form.get('category')
-#         # username = request.form.get('username')
-#         # password = request.form.get('password')
-#         # 
-        
-#         conn = get_db_connection()
-#         if conn:
-#             try:
-#                 cur = conn.cursor(buffered=True)
-                
-#                 # Check if username or email already exists in user_registration_requests or users
-#                 cur.execute("SELECT * FROM user_registration_requests WHERE username = %s OR email = %s", (username, email))
-#                 existing_user_request = cur.fetchone()
-                
-#                 cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, email))
-#                 existing_user = cur.fetchone()
-
-#                 if existing_user_request or existing_user:
-#                     flash("Username or email already exists. Please try again with different credentials.", 'danger')
-#                     return redirect(url_for('auth.register'))
-
-#                 else:                    # Insert the registration request into user_registration_requests table
-#                     cur.execute("""
-#                         INSERT INTO user_registration_requests (username, password, email, name, phone)
-#                         VALUES (%s, %s, %s, %s, %s);
-#                     """, (username, generate_password_hash(password, method='pbkdf2:sha256'), email, name, phone))
-                    
-#                     # conn.commit()
-#                     # flash("Registration request submitted successfully. Your account will be created after admin approval.", 'success')
-#                     # Insert the new user into the users table
-#                     cur.execute(
-#                         "INSERT INTO users (username, email, password, name, phone, is_admin, is_approved) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-#                         (username, email, generate_password_hash(password, method='pbkdf2:sha256'), name, phone, False, False)
-#                     )
-                    
-#                     conn.commit()
-#                     flash("Registration request submitted successfully. Your account will be created after admin approval.", 'success')
-                    
-#                 # Get A User & Insert A new business registration request into the database also with user details
-#                 # Check if username or email already exists in user_registration_requests or users
-#                 # cur.execute("SELECT * FROM user_registration_requests WHERE username = %s OR email = %s", (username, email))
-#                 # existing_user_request = cur.fetchone()
-                
-#                 cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, email))
-#                 existing_user = cur.fetchone()
-
-#                 if existing_user:
-#                     user_id = existing_user[0]
-#                     cur.execute("""
-#                         INSERT INTO business_registration_requests 
-#                         (business_name, shop_no, phone_number, block_num, category, description, user_id, email, website_url, social_handles)
-#                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-#                     """, (name, shop_no, phone, block_num, category, description, user_id, email, website_url, social_handles) )
-#                     conn.commit()
-#                     flash("Business Registration request submitted successfully. You will be able to login after admin approval.", 'success')
-#                     return redirect(url_for('index.home'))
-                
-#                 else:
-                    
-#                     return jsonify({"error":"Could not save into business_registration_requests"})
-                
-#                 return redirect(url_for('index.home'))
-            
-#             except Exception as e:
-#                 traceback.print_exc()
-#                 print(f"Database error: {e}")
-#                 flash("Error occurred during registration.", 'danger')
-#             finally:
-#                 conn.close()
-#         else:
-#             flash("Could not connect to the database.", 'danger')
-            
-#     # return render_template('register_user.html')
-#     # If GET request, render the form with empty fields
-#     return render_template(
-#         'register_user.html', 
-#         phone='', email='', website_url='', 
-#         social_handles='', description='', 
-#         name='', shop_no='', block_num='', 
-#         category='', username='', password='')  # Assume get_categories() fetches categories
 
 @bp.route('/register_business', methods=['GET', 'POST'])
 def register_business():
@@ -488,75 +377,7 @@ def register_business():
 
     return render_template('register_business.html')
 
-# @bp.route('/user_login', methods=['GET', 'POST'])
-# def user_login():
-#     print(session['user_logged_in'])
-#     if 'user_id' in session:
-#         return redirect(url_for('user.update_profile')) 
-        
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         conn = get_db_connection()
-        
-#         if conn:
-#             try:
-#                 cur = conn.cursor(dictionary=True)
-                
-#                 # Check if user exists in users table
-#                 cur.execute("SELECT * FROM users WHERE username = %s", (username,))
-#                 user = cur.fetchone()
-                
-#                 if user:
-#                     # User exists in users table
-#                     stored_password_hash = user['password']  
-#                     is_activated = user['is_activated'] 
 
-#                     # Check if the user's account is suspended
-#                     if not is_activated:
-#                         flash("Your account is not activated. Check your email for activation link.", 'danger')
-
-#                     # Check if the provided password matches the stored password hash
-#                     elif check_password_hash(stored_password_hash, password):
-#                         session['user_logged_in'] = True
-#                         session['user_id'] = user['user_id']  # Store user_id in the session
-#                         session['username'] = user['username']
-#                         session['avatar'] = user['avater'] 
-                            
-#                         flash("Login successful.", 'success')
-#                         return redirect(url_for('user.update_profile'))
-#                     else:
-#                         flash("Invalid credentials. Please check your password.", 'danger')
-#                 else:
-#                     flash("Invalid credentials. User does not exist.", 'danger')
-                
-#                 cur.close()
-#                 conn.close()
-
-#             except Exception as e:
-#                 traceback.print_exception(e)
-#     return render_template('user_login.html')
-
-# @bp.route('/forgot_password', methods=['GET', 'POST'])
-# def forgot_password():
-#     if request.method == 'POST':
-#         email = request.form['email']
-#         conn = get_db_connection()
-#         cur = conn.cursor(dictionary=True)
-#         cur.execute('SELECT id FROM users WHERE email = %s', (email,))
-#         user = cur.fetchone()
-#         cur.close()
-#         conn.close()
-
-#         if user:
-#             token = generate_token(user['id'])
-#             send_reset_email(email, token)
-#             flash('An email with a password reset link has been sent to your email address.', 'info')
-#             return redirect(url_for('auth.login'))
-#         else:
-#             flash('Email address not found.', 'danger')
-
-#     return render_template('forgot_password.html')
 @bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
@@ -579,20 +400,6 @@ def forgot_password():
             flash('Email address not found.', 'danger')
 
     return render_template('forgot_password.html')
-
-
-# from flask import request, jsonify
-
-# @bp.route('/forgot_password', methods=['POST'])
-# def forgot_password():
-#     email = request.form.get('email')
-#     user = get_user_by_email(email)  # Replace with your method to get user by email
-#     if user:
-#         user_id = user.id  # Assuming user object has an id attribute
-#         token = generate_token(user_id)  # Generate the reset token
-#         send_reset_email(app, email, token)  # Pass the token to the email function
-#         return jsonify({"message": "A password reset email has been sent."}), 200
-#     return jsonify({"message": "User not found."}), 404
 
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):

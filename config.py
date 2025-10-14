@@ -6,8 +6,6 @@ from pathlib import Path
 load_dotenv()
 
 # Build paths inside the project like: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
-# 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class Config:
@@ -30,13 +28,8 @@ class Config:
     MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'true').lower() == 'true'
     MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'noreply@simplylovely.ng')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'Your App <noreply@simplylovely.ng>')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'AJAH BUSINESSES <noreply@simplylovely.ng>')
     
-    # File Uploads
-    # UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
-    # MAX_CONTENT_LENGTH = 60 * 1024 * 1024  # 60 MB
-    # ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'wmv'}
-
     # Correct upload folder configuration
     UPLOAD_FOLDER = os.path.join('static', 'uploads')  # Relative to application
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # 2MB limit

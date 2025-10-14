@@ -1,3 +1,4 @@
+from os import getenv
 from flask import Flask, url_for
 from config import config
 from flask_mail import Mail
@@ -43,6 +44,7 @@ def create_app(config_name='default'):
     
     return app
 
+app = create_app(getenv('FLASK_ENV', 'production'))
+
 if __name__ == '__main__':
-    app = create_app('development')
     app.run(host='0.0.0.0', port=5000)

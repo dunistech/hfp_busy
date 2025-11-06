@@ -1,0 +1,20 @@
+{
+  "name": "Ajah Businesses Directory",
+  "short_name": "AjahBiz",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#040450",
+  "icons": [
+    {
+      "src": "/static/img/icons/dunislogo_128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/img/icons/dunislogo_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

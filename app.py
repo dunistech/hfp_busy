@@ -27,7 +27,7 @@ def create_app(config_name='default'):
     
     # Register context processors
     from utils.helpers import fetch_categories, fetch_plans
-    app.context_processor(lambda: {'logo_path': url_for('static', filename='img/dunistech.png')})
+    app.context_processor(lambda: {'logo_path': url_for('static', filename='img/icons/dunislogo_128.png')})
     app.context_processor(fetch_categories)
     app.context_processor(fetch_plans)
     

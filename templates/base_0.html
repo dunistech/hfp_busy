@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    {# <title>BUSINESSES IN AJAH HFP EASTLINE SHOPPING COMPLEX ABRAHAM ADESANYA TRAFFIC LIGHT</title>  #}
+    <title>BUSINESS IN AJAH,HFP, IKOTA, LEKKI, VGC, ILAJE, SANGOTEDO, BADORE, AJIWE, AWOYAYA, IBEJU-LEKKI, OGOMBO, ABRAHAM ADESANYA, ISLAND </title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="BUSINESS IN AJAH, HFP, IKOTA, LEKKI, VGC, ILAJE, SANGOTEDO, BADORE, AJIWE, AWOYAYA, IBEJU-LEKKI, OGOMBO, ABRAHAM ADESANYA, ISLAND" name="keywords">
+    <meta content="BUSINESS IN AJAH, HFP, IKOTA, LEKKI, VGC, ILAJE, SANGOTEDO, BADORE, AJIWE, AWOYAYA, IBEJU-LEKKI, OGOMBO, ABRAHAM ADESANYA, ISLAND" name="description">
+
+    <!-- Favicon -->
+    <link href="{{ logo_path}}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{{ url_for('static', filename='assets/lib/owlcarousel/assets/owl.carousel.min.css') }}"
+        rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css') }}"
+        rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
+
+        <!--NEW -->
+      <!-- Bootstrap CSS --
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    
+    <!-- Font Awesome (if using) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- PWA -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/img/favicon.ico') }}"> 
+    <meta name="theme-color" content="#040450">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/img/icons/dunislogo_512.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/img/favicon.ico') }}">
+    <script>
+    if ("serviceWorker" in navigator) {
+        // navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}");
+        navigator.serviceWorker.register("/static/service-worker.js");
+
+    }
+    </script>
+
+    <style>
+#install-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 2000;
+    background-color: #040450;
+    color: #fff;
+    border-radius: 8px;
+    padding: 12px 18px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+</style>
+
+</head>
+
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
+
+<body>
+    <!-- Your HTML content here -->
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="flash-message {{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.flash-message').forEach(function (message) {
+                message.addEventListener('click', function () {
+                    message.classList.add('fade-out');
+                    setTimeout(function () {
+                        message.remove();
+                    }, 500); // Wait for the fade-out transition to finish
+                });
+            });
+        });
+
+    </script>
+
+    <!-- Topbar Start -->
+    <div class="container-fluid bg-light pt-3 d-none d-lg-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
+                    <div class="d-inline-flex align-items-center">
+                        <p><img src="{{ logo_path }}" alt="" style="width: 60px;"> &nbsp;<i
+                                class="fa fa-envelope mr-2"></i> <a
+                                href="mailto:+2347032276597">info@dunistech.ng</a></p>
+                        <p class="text-body px-3">|</p>
+                        <p><i class="fa fa-phone-alt mr-2"></i><a href="tel:+2347032276597">+234 703 227 6597</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center text-lg-right">
+                    <div class="d-inline-flex align-items-center">
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a class="text-primary pl-3" href="">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+    <!-- Navbar Start -->
+    <div class="container-fluid p-0 sticky-top" style="z-index: 1030;">
+        <!-- Full-width container -->
+        <div class="container-fluid px-0">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-lg">
+                <!-- Brand -->
+                <a href="{{ url_for('index.home') }}" class="navbar-brand">
+                    {# <h1 class="m-0 text-primary"><span class="text-dark">HFP</span>Business</h1> #}
+                    {#<h1 class="m-0 text-primary"><span class="text-dark">AJAH</span> BUSINESS DIRECTORY</h1>#}
+                    <h1 class="m-0 text-primary"><span class="text-dark">AJAH</span> BUSINESSES</h1>
+                </a>
+
+                <!-- Toggler for Mobile View -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navbar Collapse -->
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <!-- Nav Items -->
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a href="{{ url_for('index.home') }}" class="nav-link active">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('index.home') }}#about" class="nav-link">About</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link" id="" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Categories <i class="fa fa-chevron-down ml-2"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                
+                                {% for category in categories %}
+                                    <a href="{{ url_for('user.businesses_by_category', category_id=category.id) }}" class="dropdown-item">
+                                        {{ category.name }}
+                                    </a>
+                                {% endfor %}
+                                
+                            </div>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="{{ url_for('index.home') }}#contact" class="nav-link">Contact</a>
+                        </li>
+                    </ul>
+
+                    
+                    
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('user.profile') }}" class="btn btn-lg ml-3"
+                        style="background-color: #040450;color: white;">{{session.get('username')}}</a>
+                    {% else %}
+                    <!-- Business Owner Signin Button -->
+                    <a href="{{ url_for('auth.login') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
+                        style="background-color: #040450;color: white;">Sign in</a>
+                    {% endif %}
+                    
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
+        
+        <!-- Navbar End -->
+        {% block content %}
+
+        {% endblock %}
+
+        <div id="contact"></div>
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-light text-dark py-5 px-sm-3 px-lg-5" style="margin-top: 90px;">
+        <div class="row pt-5">
+            <div class="col-lg-6 col-md-6 mb-5">
+                <a href="#" class="navbar-brand">
+                    <span class="text-dark">
+                        <img src="{{ logo_path }}" width="200px" class="img-fluid" alt="Dunis Tech Logo">
+                    </span>
+                </a>
+                <p class="footer-description">Dunis Technologies Limited is a global tech company that builds innovative software, grooms tech experts via professional training and mentorship, and renders computer sales and services. For more, please visit <a href="https://dunistech.ng" target="_blank">dunistech.ng</a>.</p>
+                <h6 class="text-dark text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">Follow Us</h6>
+                <div class="d-flex justify-content-start">
+                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
+                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a class="btn btn-outline-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a class="btn btn-outline-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+                <h5 class="text-dark text-uppercase mb-4 mt-4" style="letter-spacing: 5px;">Our Services</h5>
+                <div class="d-flex flex-column justify-content-start">
+                    <a class="text-dark mb-2" href="http://dunistech.ng/services"><i class="fa fa-angle-right mr-2"></i>Software Development</a>
+                    <a class="text-dark mb-2" href="http://dunistech.ng/services"><i class="fa fa-angle-right mr-2"></i>Web Design, Hosting & Maintenance</a>
+                    <a class="text-dark mb-2" href="http://dunistech.ng/services"><i class="fa fa-angle-right mr-2"></i>Coding & Computer Training School</a>
+                    <a class="text-dark" href="http://dunistech.ng/services"><i class="fa fa-angle-right mr-2"></i>Computer & Accessories Sales</a>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 mb-5">
+                <h5 class="text-dark text-uppercase mb-4" style="letter-spacing: 5px;">Contact Us</h5>
+                <p><i class="fa fa-map-marker-alt mr-2"></i>GRACELAND ESTATE, 1 Gbade Amao St, <br> Ajiwe, Lekki 3, Lagos</p> 
+                <p><i class="fa fa-phone-alt mr-2"></i>
+                    <a href="tel:+2347043944279">+234 704 394 4279</a> |
+                    <a href="tel:07032276597">07032276597</a>
+                </p>
+                <hr>
+                <p><i class="fa fa-map-marker-alt mr-2"></i>HFP EASTLINE SHOPPING COMPLEX, ABRAHAM ADESANYA TRAFFIC LIGHT
+                    <br>BLOCK F4, SHOP 39 & 40.</p> 
+                <p><i class="fa fa-phone-alt mr-2"></i>
+                    <a href="tel:+2348122477213">+234 812 247 7213</a> |
+                    <a href="tel:07032276597">07032276597</a>
+                </p>
+                <hr>
+                <p><i class="fa fa-envelope mr-2"></i><a href="mailto:info@dunistech.ng">info@dunistech.ng</a></p>
+                <h6 class="text-dark text-uppercase mt-4 mb-3" style="letter-spacing: 5px;">JOIN OUR MAILING LIST</h6>
+                <p>To get training, events, and product updates</p>
+                <div class="w-100">
+                    <div class="input-group">
+                        <input type="text" class="form-control rounded" style="padding: 25px;" placeholder="Type or paste your email here">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary px-3 rounded btn-lg">SUBMIT</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid bg-light text-dark border-top py-4 px-sm-3 px-md-5" style="border-color: rgba(0, 0, 0, .1) !important;">
+        <div class="row">
+            <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
+                <p class="m-0 text-dark">Copyright &copy; <a href="http://dunistech.ng">Dunis Tech</a>. All Rights Reserved.</p>
+            </div>
+            <div class="col-lg-6 text-center text-md-right">
+                <p class="m-0 text-dark">Designed by <a href="http://dunistech.ng/academy">The Dunistech Software Engineering Dept.</a></p>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+    <style>
+        .footer-description {
+            max-width: 500px; /* Adjust the width as needed */
+            line-height: 1.5; /* Improve readability */
+        }
+        
+    </style>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="btn btn-primary back-to-top" id="back-to-top">
+        <i class="fas fa-arrow-up"></i> <!-- Font Awesome icon for the arrow (optional) -->
+    </a>
+
+    <button id="install-btn" style="display:none1;" class="btn btn-primary">
+    Install App
+    </button>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/easing/easing.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/owlcarousel/owl.carousel.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/tempusdominus/js/moment.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+
+    <!-- Contact Javascript File -->
+    <script src="{{ url_for('static', filename='assets/mail/jqBootstrapValidation.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/mail/contact.js') }}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+
+   <script>
+let deferredPrompt;
+const installBtn = document.getElementById('install-btn');
+
+// installBtn.style.display = 'none'; // hide by default
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block'; // only show when ready
+});
+
+installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+        console.log("Install prompt not available yet");
+        return;
+    }
+
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User choice: ${outcome}`);
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+});
+
+</script>
+
+</body>
+
+</html>

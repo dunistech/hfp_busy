@@ -419,7 +419,7 @@ def business_profile(business_id):
                 file = request.files.get('business_media')
                 selected_category_ids = request.form.getlist('categories')
 
-                update_fields = {
+                update_fields_raw = {
                     'business_name': business_name,
                     'description': description,
                     'phone_number': phone_number,
@@ -437,21 +437,33 @@ def business_profile(business_id):
                 if file and file.filename:
                     file_path = upload_file(file)
                     if file_path:
-                        update_fields['media_url'] = file_path
-                        update_fields['media_type'] = 'image'
+                        mimetype = getattr(file, 'mimetype', '') or getattr(file, 'content_type', '')
+                        print(f"Uploaded file mimetype: {mimetype}")  # Debug print
+                        if mimetype and mimetype.startswith('video/'):
+                            update_fields_raw['media_url'] = file_path
+                            update_fields_raw['media_type'] = 'video'
+                        else:
+                            update_fields_raw['media_url'] = file_path
+                            update_fields_raw['media_type'] = 'image'
+                    print(f"File uploaded to: {file_path}")  # Debug print
+                    
+                # Remove keys with None or empty strings so we don't overwrite existing data with NULLs
+                update_fields = {k: v for k, v in update_fields_raw.items() if v is not None and v != ''}
 
-                # Build and execute update query
-                set_clause = ', '.join([f"{k} = %s" for k in update_fields])
-                values = list(update_fields.values()) + [business_id]
+                # Only execute update when there are fields to change
+                if update_fields:
+                    set_clause = ', '.join([f"{k} = %s" for k in update_fields])
+                    values = list(update_fields.values())
 
-                # If not admin, enforce owner check
-                if not is_admin:
-                    update_sql = f"UPDATE businesses SET {set_clause} WHERE id = %s AND owner_id = %s"
-                    values.append(user_id)
-                else:
-                    update_sql = f"UPDATE businesses SET {set_clause} WHERE id = %s"
+                    # If not admin, enforce owner check (value order must match placeholders)
+                    if not is_admin:
+                        update_sql = f"UPDATE businesses SET {set_clause} WHERE id = %s AND owner_id = %s"
+                        values.extend([business_id, user_id])
+                    else:
+                        update_sql = f"UPDATE businesses SET {set_clause} WHERE id = %s"
+                        values.append(business_id)
 
-                cur.execute(update_sql, values)
+                    cur.execute(update_sql, values)
 
                 # Update business categories
                 cur.execute("DELETE FROM business_categories WHERE business_id = %s", (business_id,))

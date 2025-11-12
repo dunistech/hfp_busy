@@ -15,8 +15,11 @@ __pycache__/
 steps_to_create_gitignore_and_requiremen_database_export
 
 
+# ignore uploaded media files
+static/uploads/
 
 # Ignore log files
 *.log
 
-udo mysql
+# Ignore IDE specific files
+.vscode/.idea/

@@ -35,7 +35,6 @@ class Config:
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # 2MB limit
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
 
-    
     # Security
     SESSION_COOKIE_SECURE = FLASK_ENV == 'production'
     REMEMBER_COOKIE_SECURE = FLASK_ENV == 'production'

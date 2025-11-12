@@ -17,11 +17,11 @@
                      class="img-fluid w-100 h-100 object-fit-cover" 
                      alt="{{ business.business_name }}">
                 {% else %}
-                <div class="video-thumbnail w-100 h-100">
-                    <video class="w-100 h-100">
+                <div class="video-thumbnail1  w-100 h-100">
+                    <video class="w-100 h-100"controls muted>
                         <source src="{{ business.media_url }}" type="video/mp4">
                     </video>
-                    <div class="play-icon"><i class="fas fa-play"></i></div>
+                    <!--<div class="play-icon"><i class="fas fa-play"></i></div> -->
                 </div>
                 {% endif %}
             {% else %}

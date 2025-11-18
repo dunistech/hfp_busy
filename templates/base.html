@@ -33,6 +33,57 @@
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
     
+    {#
+    {% if business %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "{{ business.name }}",
+            "image": "{{ business.image_url }}",
+            "url": "{{ url_for('view_listing', id=business.id, _external=True) }}",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "{{ business.address }}",
+                "addressLocality": "Ajah",
+                "addressRegion": "Lagos State",
+                "addressCountry": "Nigeria"
+            },
+            "telephone": "{{ business.phone }}"
+        }
+        </script>
+    {% endif %}
+    #}
+
+    {% if business %}
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "{{ business.business_name }}",
+    "image": "{{ business.media_url }}",
+    "url": "{{ url_for('user.public_business_profile', business_id=business.id, _external=True) }}",
+    "description": "{{ business.description | replace('\n', ' ') }}",
+    "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ business.address }}",
+    "addressLocality": "Ajah",
+    "addressRegion": "Lagos State",
+    "addressCountry": "Nigeria"
+    },
+    "telephone": "{{ business.phone_number }}",
+    "email": "{{ business.email }}",
+    "priceRange": "$$",
+    "sameAs": [
+    {% if business.facebook_link %}"{{ business.facebook_link }}",{% endif %}
+    {% if business.instagram_link %}"{{ business.instagram_link }}",{% endif %}
+    {% if business.twitter_link %}"{{ business.twitter_link }}"{% endif %}
+    ]
+    }
+    </script>
+    {% endif %}
+
+
 
     <style>
         html {
@@ -502,7 +553,7 @@
                     {% else %}
                     <!-- Business Owner Signin Button -->
                     <a href="{{ url_for('auth.login') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
-                        style="background-color: #040450;color: white;">Sign in</a>
+                        style="background-color: #040450;color: white;">Sign In/Up</a>
                     {% endif %}
                     
                 </div>

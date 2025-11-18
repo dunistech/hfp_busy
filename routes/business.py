@@ -201,7 +201,6 @@ def process_business_registration():
     
     return redirect(url_for('admin.admin_dashboard'))
 
-# 
 
 @bp.route('/subscribe/<int:business_id>', methods=['POST'])
 def subscribe(business_id):

@@ -84,7 +84,7 @@
                     <i class="fas fa-store fa-2x mb-3"></i>
                     <h4>No businesses found yet</h4>
                     <p class="mb-3">Be the first to register your business in our directory</p>
-                    <a href="{{ url_for('auth.register_business') }}" class="btn btn-primary">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">
                         <i class="fas fa-plus me-1"></i> Add Your Business
                     </a>
                 </div>
@@ -145,12 +145,30 @@
                 <div class="about-text bg-white p-4 p-lg-5 my-lg-5">
                     <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">About Us</h6>
                     <h1 class="mb-3">Connecting Businesses and Customers</h1>
-                    <p>Our mission is to create a technology platform where businesses in AJAH, HFP, IKOTA, LEKKI, VGC, ILAJE, SANGOTEDO, BADORE, AJIWE, AWOYAYA, IBEJU-LEKKI, OGOMBO, ABRAHAM ADESANYA, ISLAND can become more visible than ever before and thereby increase their customer patronage.
+                    
+                    <p>
+                        AjahBiz is the leading online business directory, innovated, designed and developed by Dunis Technologies Limited, for increasing the visibility of trusted businesses, service providers, and shops in Ajah, Lagos. 
+                        Whether you're searching for restaurants, ICT training centres, supermarkets, artisans, boutiques, real estate agents, clinics, laundry, tailoring/fashion shop, etc. our platform provides verified business details, accurate contact information, weekly blog and updated location data.
+
+                    </p>
+                    <p>
+                         Designed for visibility and convenience, AjahBiz helps residents and visitors easily find reliable businesses within the Ajah community. Business owners can also list their companies/shops for a token of 20,000naira for four months or upgrade for premium visibility. Explore AjahBiz today and connect with the right businesses around you.
+                    </p>
+
+                    <!--
+                    <p>
+                        Our mission is to create a technology platform where businesses in AJAH, HFP, IKOTA, LEKKI, VGC, 
+                        ILAJE, SANGOTEDO, BADORE, AJIWE, AWOYAYA, IBEJU-LEKKI, OGOMBO, ABRAHAM ADESANYA, 
+                        ISLAND can become more visible than ever before and thereby increase their customer patronage.
                     </p>
                     <p><strong>The Best Directory for Your Business Needs:</strong>
                         At Dunis Technologies Limited, we innovate, design and develop user-friendly software applications that helps organisations/business/company enhance and accelerate their operations; 
                         leading to greater revenue, profits and impacts.</p>
-                    <!-- <div class="row mb-4">
+                    
+                    -->
+
+                    <!-- 
+                    <div class="row mb-4">
                         <div class="col-6">
                             <img class="img-fluid" src="img/about-1.jpg" alt="">
                         </div>
@@ -158,7 +176,7 @@
                             <img class="img-fluid" src="img/about-2.jpg" alt="">
                         </div>
                     </div> -->
-                    <a href="{{ url_for('auth.register_business') }}" class="btn btn-primary btn-lg rounded">Get Started</a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg rounded">Get Started</a>
                 </div>
             </div>
         </div>
@@ -275,7 +293,7 @@
                     <li class="py-2"><i class="fa fa-check text-primary mr-3"></i><strong>Upload banners, videos to advertise your business or event as often as you want</strong></li>
                     <li class="py-2"><i class="fa fa-check text-primary mr-3"></i><strong>Quarterly, bi-annual, and yearly subscriptions available</strong></li>
                 </ul>
-                <a href="{{ url_for('auth.register_business') }}" class="btn btn-lg btn-success rounded">Get Started</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-lg btn-success rounded">Get Started</a>
             </div>
 
             <!-- Premium Membership Section -->
@@ -290,7 +308,7 @@
                     <li class="py-2"><i class="fa fa-check text-primary mr-3"></i><strong>Only yearly subscription available</strong></li>
                     <li class="py-2"><i class="fa fa-check text-primary mr-3"></i><strong>Limited space available; only for the first 8 subscribers</strong></li>
                 </ul>
-                <a href="{{ url_for('auth.register_business') }}" class="btn btn-lg btn-success rounded">Get Started</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-lg btn-success rounded">Get Started</a>
             </div>
         </div>
     </div>
@@ -340,6 +358,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-lg-4 col-md-6 mb-4 pb-2">
                 <div class="blog-item">
                     <div class="position-relative">

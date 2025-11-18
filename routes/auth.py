@@ -59,7 +59,7 @@ def login():
             if conn:
                 conn.close()
     
-    return render_template('auth/login.html')
+    return render_template('auth/login_0.html')
 
 @bp.route('/logout')
 def logout():
@@ -305,7 +305,7 @@ def register():
             if conn:
                 conn.close()
 
-    return render_template('auth/register.html')
+    return render_template('auth/register_0.html')
 
 def validate_registration(username, email, password, phone):
     """Validate registration form data"""

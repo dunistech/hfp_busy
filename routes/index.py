@@ -74,7 +74,6 @@ def home(page=1):
         if conn:
             conn.close()
 
-
 # Add custom routes
 @bp.route("/routes")
 def site_map():

@@ -3,7 +3,7 @@
 <div class="container-fluid p-0" style="margin-top: 0;">
   <div id="header-carousel" class="carousel slide" data-ride="carousel" style="margin-top: 0;">
     <div class="carousel-inner">
-
+      {#
       {% set slides = [
         {
           'image': 'assets/img/hero-small2.png', 
@@ -47,6 +47,33 @@
           'btn_link': "https://scholarships.dunistech.ng?summerscholarship",
           'overlay': False
         },
+        
+      ] %}
+      #}
+
+      {% set slides = [
+        {
+          'image': 'assets/img/hero-small2.png', 
+          'title': 'Promote & Elevate Your Brand',
+          'btn_text': 'Get Started',
+          'btn_link': url_for('user.add_business'),
+          'overlay': True
+        },
+        {
+          'image': './img/hero/simplylovely.jpg',
+          'title': '',
+          'btn_text': 'Fashion And Beauty',
+          'btn_link': "https://simplylovely.ng/",
+          'overlay': False
+        },
+        {
+          'image': './img/hero/dunistech.jpg',
+          'title': '',
+          'btn_text': 'Tech And Innovations',
+          'btn_link': "https://dunistech.ng",
+          'overlay': False
+        },
+        
       ] %}
 
       {% for slide in slides %}

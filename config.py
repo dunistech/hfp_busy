@@ -32,7 +32,7 @@ class Config:
     
     # Correct upload folder configuration
     UPLOAD_FOLDER = os.path.join('static', 'uploads')  # Relative to application
-    MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # 2MB limit
+    MAX_CONTENT_LENGTH = 8 * 1024 * 1024  # 2MB limit
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
 
     # Security

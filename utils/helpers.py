@@ -149,11 +149,11 @@ def fetch_categories():
     if conn:
         try:
             cur = conn.cursor(dictionary=True)  # Fetch rows as dictionaries
-            cur.execute("SELECT id, category_name FROM categories")
+            cur.execute("SELECT id, category_name, slug FROM categories")
             result = cur.fetchall()
             # categories = {row['id']: row['category_name'] for row in result}  # Convert to dict
 
-            categories = [{"id": row['id'], 'name': row['category_name'] } for row in result]  # List of named tuples
+            categories = [{"id": row['id'], 'name': row['category_name'], 'slug': row['slug'] } for row in result]  # List of named tuples
             
         except mysql.connector.Error as e:
             print(f"Database error: {e}")

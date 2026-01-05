@@ -1,0 +1,98 @@
+        <!-- Topbar Start -->
+    <div class="container-fluid bg-light pt-3 d-none d-lg-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
+                    <div class="d-inline-flex align-items-center">
+                        <p><img src="{{ logo_path }}" alt="" style="width: 60px;"> &nbsp;<i
+                                class="fa fa-envelope mr-2"></i> <a
+                                href="mailto:+2347032276597">info@dunistech.ng</a></p>
+                        <p class="text-body px-3">|</p>
+                        <p><i class="fa fa-phone-alt mr-2"></i><a href="tel:+2347032276597">+234 703 227 6597</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center text-lg-right">
+                    <div class="d-inline-flex align-items-center">
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a class="text-primary px-3" href="">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a class="text-primary pl-3" href="">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+     
+    <!-- Navbar Start -->
+    <div class="container-fluid p-0 sticky-top" style="z-index: 1030;">
+        <!-- Full-width container -->
+        <div class="container-fluid px-0">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-lg">
+                <!-- Brand -->
+                <a href="{{ url_for('index.home') }}" class="navbar-brand">
+                    {# <h1 class="m-0 text-primary"><span class="text-dark">HFP</span>Business</h1> #}
+                    {#<h1 class="m-0 text-primary"><span class="text-dark">AJAH</span> BUSINESS DIRECTORY</h1>#}
+                    <h1 class="m-0 text-primary"><span class="text-dark">AJAH</span> BUSINESSES</h1>
+                </a>
+
+                <!-- Toggler for Mobile View -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navbar Collapse -->
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <!-- Nav Items -->
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a href="{{ url_for('index.home') }}" class="nav-link active">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('index.home') }}#about" class="nav-link">About</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link" id="" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Categories <i class="fa fa-chevron-down ml-2"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                
+                                {% for category in categories %}
+                                    <a href="{{ url_for('categories.businesses_by_category', category_slug=category.slug) }}" class="dropdown-item">
+                                        {{ category.name }}
+                                    </a>
+                                {% endfor %}
+                                
+                            </div>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="{{ url_for('index.home') }}#contact" class="nav-link">Contact</a>
+                        </li>
+                    </ul>
+
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('user.profile') }}" class="btn btn-lg ml-3"
+                        style="background-color: #040450;color: white;">{{session.get('username')}}</a>
+                    {% else %}
+                    <!-- Business Owner Signin Button -->
+                    <a href="{{ url_for('auth.login') }}" class="btn py-md-3 px-md-5 mt-2 btn-lg rounded"
+                        style="background-color: #040450;color: white;">Sign In/Up</a>
+                    {% endif %}
+                    
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->

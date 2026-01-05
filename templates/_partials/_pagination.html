@@ -5,8 +5,8 @@
         {% if pagination.has_prev %}
         <li class="page-item">
             <a class="page-link" href="
-                {% if request.endpoint == 'user.search_business' %}
-                    {{ url_for('user.search_business', page=pagination.page-1, search_query=search_query, category=selected_category) }}
+                {% if request.endpoint == 'business.search_business' %}
+                    {{ url_for('business.search_business', page=pagination.page-1, search_query=search_query, category=selected_category) }}
                 {% elif request.endpoint == 'user.businesses_by_category' %}
                     {{ url_for('user.businesses_by_category', category_id=category.id, page=pagination.page-1) }}
                 {% else %}
@@ -26,8 +26,8 @@
             {% else %}
             <li class="page-item">
                 <a class="page-link" href="
-                    {% if request.endpoint == 'user.search_business' %}
-                        {{ url_for('user.search_business', page=p, search_query=search_query, category=selected_category) }}
+                    {% if request.endpoint == 'business.search_business' %}
+                        {{ url_for('business.search_business', page=p, search_query=search_query, category=selected_category) }}
                     {% elif request.endpoint == 'user.businesses_by_category' %}
                         {{ url_for('user.businesses_by_category', category_id=category.id, page=p) }}
                     {% else %}
@@ -43,8 +43,8 @@
         {% if pagination.has_next %}
         <li class="page-item">
             <a class="page-link" href="
-                {% if request.endpoint == 'user.search_business' %}
-                    {{ url_for('user.search_business', page=pagination.page+1, search_query=search_query, category=selected_category) }}
+                {% if request.endpoint == 'business.search_business' %}
+                    {{ url_for('business.search_business', page=pagination.page+1, search_query=search_query, category=selected_category) }}
                 {% elif request.endpoint == 'user.businesses_by_category' %}
                     {{ url_for('user.businesses_by_category', category_id=category.id, page=pagination.page+1) }}
                 {% else %}

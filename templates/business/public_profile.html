@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <div class="container py-5">
     <!-- Business Header -->
     <div class="row mb-5">
@@ -261,7 +262,7 @@
                 <div class="card-body">
                     <div class="list-group list-group-flush">
                         {% for biz in similar_businesses %}
-                        <a href="{{ url_for('user.public_business_profile', business_id=biz.id) }}" 
+                        <a href="{{ url_for('business.public_business_profile', business_slug=biz.slug) }}" 
                            class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 {% if biz.media_url %}

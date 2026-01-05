@@ -30,6 +30,7 @@ def create_app(config_name='default'):
     app.context_processor(lambda: {'logo_path': url_for('static', filename='img/icons/dunislogo_128.png')})
     app.context_processor(fetch_categories)
     app.context_processor(fetch_plans)
+    app.context_processor(lambda: {"seo": None}) # meant to prevent a crash on pages without seo but not necessarily, it's not breaking though. 
     
     # Register blueprints
     with app.app_context():

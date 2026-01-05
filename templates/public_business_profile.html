@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <div class="container py-5">
     <!-- Business Header -->
     <div class="row mb-5">
@@ -8,9 +9,7 @@
             <div class="business-media-container shadow-sm rounded">
                 {% if business.media_type and business.media_url %}
                     {% if business.media_type == 'image' %}
-                    <img src="{{ business.media_url }}" 
-                         class="img-fluid rounded" 
-                         alt="{{ business.business_name }}">
+                    <img src="{{ business.media_url }}" class="img-fluid rounded" alt="{{ business.business_name }}">
                     {% else %}
                     <video class="img-fluid rounded" controls>
                         <source src="{{ business.media_url }}" type="video/mp4">
@@ -173,7 +172,7 @@
                 <div class="card-body">
                     <div class="list-group list-group-flush">
                         {% for biz in similar_businesses %}
-                        <a href="{{ url_for('user.public_business_profile', business_id=biz.id) }}" 
+                        <a href="{{ url_for('business.public_business_profile', business_slug=biz.slug) }}" 
                            class="list-group-item list-group-item-action">
                             <div class="d-flex align-items-center">
                                 {% if biz.media_url %}

@@ -17,7 +17,7 @@
                 <p class="lead text-muted">{{ pagination.total }} result{% if pagination.total != 1 %}s{% endif %} found</p>
             </div>
             <div class="col-md-4">
-                <form action="{{ url_for('user.search_business') }}" method="get" class="mb-3">
+                <form action="{{ url_for('business.search_business') }}" method="get" class="mb-3">
                     <div class="input-group">
                         <input type="text" name="search_query" class="form-control" 
                                placeholder="Search again..." value="{{ search_query }}">
@@ -35,7 +35,7 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title mb-3"><i class="fas fa-filter me-2"></i>Filters</h5>
-                        <form method="get" action="{{ url_for('user.search_business') }}">
+                        <form method="get" action="{{ url_for('business.search_business') }}">
                             <input type="hidden" name="search_query" value="{{ search_query }}">
                             <div class="row">
                                 <div class="col-md-4 mb-3">

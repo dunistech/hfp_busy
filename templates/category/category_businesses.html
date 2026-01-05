@@ -2,6 +2,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <div class="container-fluid py-5">
     <div class="container pt-5 pb-3">
         <div class="row">
@@ -39,7 +40,7 @@
                     {% if businesses %}
                         {% for business in businesses %}
                         <!-- Business Card (same as home page template) -->
-                        {% include '_business_card.html' %}
+                        {% include '_partials/_business_card.html' %}
                         {% endfor %}
                     {% else %}
                     <div class="col-12">
@@ -58,7 +59,7 @@
                 </div>
                 
                 <!-- Pagination (same as home page template) -->
-                {% include '_pagination.html' %}
+                {% include '_partials/_pagination.html' %}
             </div>
 
             <!-- Sidebar with Categories -->
@@ -70,9 +71,9 @@
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush">
                             {% for cat in all_categories %}
-                            <a href="{{ url_for('user.businesses_by_category', category_id=cat.id) }}" 
+                            <a href="{{ url_for('categories.businesses_by_category', category_slug=cat.slug) }}" 
                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center 
-                                      {% if cat.id == category.id %}active{% endif %}">
+                                      {% if cat.slug == category.slug %}active{% endif %}">
                                 {{ cat.category_name }}
                                 <span class="badge bg-primary rounded-pill">{{ cat.business_count }}</span>
                             </a>

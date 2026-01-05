@@ -2,14 +2,14 @@
 
 {% block content %}
 
-{% include 'hero.html' %}
+{% include '_partials/hero.html' %}
 
 <div class="container-fluid booking mt-5 pb-5">
     <div class="container pb-5">
         <div class="search-container shadow">
             <div class="row align-items-center" style="min-height: 60px;">
                 <div class="col-lg-12 col-md-12 mb-3 mb-lg-0">
-                    <form action="{{ url_for('user.search_business') }}" method="get">
+                    <form action="{{ url_for('business.search_business') }}" method="get">
                         <input type="text" name="search_query"
                             placeholder="Search by category, business name, or shop number" required>
                         <button class="btn btn-primary btn-block" type="submit">Search</button>
@@ -73,7 +73,7 @@
 
              {% for business in businesses %}
                 <!-- Business Card (same as home page template) -->
-                {% include '_business_card.html' %}
+                {% include '_partials/_business_card.html' %}
                 
             {% endfor %}
 

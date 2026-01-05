@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    
+    {% block seo %}
+        {% include "_partials/seo_head.html" %}
+    {% endblock %}
+    
     <title>BUSINESS IN AJAH,HFP, IKOTA, LEKKI, VGC, ILAJE, SANGOTEDO, BADORE, AJIWE, AWOYAYA, IBEJU-LEKKI, OGOMBO, ABRAHAM ADESANYA, ISLAND</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="BUSINESS IN AJAH, HFP, IKOTA, LEKKI, VGC, ILAJE, SANGOTEDO, BADORE, AJIWE, AWOYAYA, IBEJU-LEKKI, OGOMBO, ABRAHAM ADESANYA, ISLAND" name="keywords">
     <meta content="BUSINESS IN AJAH, HFP, IKOTA, LEKKI, VGC, ILAJE, SANGOTEDO, BADORE, AJIWE, AWOYAYA, IBEJU-LEKKI, OGOMBO, ABRAHAM ADESANYA, ISLAND" name="description">
 
-    {% include "_partials/seo_head.html" %}
-    
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#040450">

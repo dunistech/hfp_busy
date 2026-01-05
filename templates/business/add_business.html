@@ -2,6 +2,19 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<style>
+.form-control.is-invalid, .form-select.is-invalid, .form-check-input.is-invalid {
+    border-color: #dc3545;
+}
+.form-check-input.is-invalid {
+    border-color: #dc3545;
+}
+.select2-container--default .select2-selection--multiple.is-invalid {
+    border-color: #dc3545 !important;
+}
+</style>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -23,12 +36,31 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="categories" class="form-label">Categories*</label>
                                     <select class="form-select" id="categories" name="categories" multiple required>
-                                        {% for category in categories %}
-                                        <option value="{{ category.id }}">{{ category.name }}</option>
-                                        {% endfor %}
-                                    </select>
+    {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+    {% endfor %}
+    <option value="other">Other (Specify)</option>
+</select>
+<div class="mb-3 d-none" id="customCategoryWrapper">
+    <label for="custom_categories" class="form-label">
+        Specify Other Category/Categories
+    </label>
+    <input
+        type="text"
+        class="form-control"
+        id="custom_categories"
+        name="custom_categories"
+        placeholder="e.g. Drone Services, Crypto Consulting"
+    >
+    <div class="form-text">
+        Separate multiple categories with commas
+    </div>
+</div>
+
                                     <div class="form-text">Hold Ctrl/Cmd to select multiple categories</div>
                                 </div>
+
+                                
                             </div>
                             
                             <div class="mb-3">
@@ -187,15 +219,14 @@
     </div>
 </div>
 
+<!-- Include Select2 CSS and JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+
 <script>
-// Initialize select2 for categories
-$(document).ready(function() {
-    $('#categories').select2({
-        placeholder: "Select categories",
-        allowClear: true,
-        width: '100%'
-    });
-});
+
 
 // Media preview functionality
 document.getElementById('business_media').addEventListener('change', function(e) {
@@ -251,21 +282,31 @@ document.querySelector('form').addEventListener('submit', function(e) {
         });
     }
 });
+
+
+/**
+CATEGORIES - Toggle logic (Select2-safe)
+*/
+document.addEventListener('DOMContentLoaded', () => {
+  const categories = document.getElementById('categories');
+  const wrapper = document.getElementById('customCategoryWrapper');
+  const customInput = document.getElementById('custom_categories');
+
+  categories.addEventListener('change', () => {
+    const selectedValues = Array.from(categories.selectedOptions)
+      .map(option => option.value);
+
+    if (selectedValues.includes('other')) {
+      wrapper.classList.remove('d-none');
+      customInput.setAttribute('required', 'required');
+    } else {
+      wrapper.classList.add('d-none');
+      customInput.removeAttribute('required');
+      customInput.value = '';
+    }
+  });
+});
+
 </script>
 
-<!-- Include Select2 CSS and JS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-<style>
-.form-control.is-invalid, .form-select.is-invalid, .form-check-input.is-invalid {
-    border-color: #dc3545;
-}
-.form-check-input.is-invalid {
-    border-color: #dc3545;
-}
-.select2-container--default .select2-selection--multiple.is-invalid {
-    border-color: #dc3545 !important;
-}
-</style>
 {% endblock %}

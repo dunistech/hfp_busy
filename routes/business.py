@@ -6,6 +6,7 @@ import mysql
 from services.schema import business_schema
 from services.seo import build_seo
 from utils.helpers import get_db_connection, upload_file
+from utils.slug import generate_unique_slug, slugify
 
 
 bp = Blueprint('business', __name__)
@@ -761,4 +762,127 @@ def search_business():
     finally:
         if conn:
             conn.close()
+
+@bp.route('/add-business', methods=['GET', 'POST'])
+def add_business():
+    """Add new business with integrated status handling"""
+    if 'user_id' not in session:
+        flash('Please log in to add a business.', 'error')
+        return redirect(url_for('auth.login'))
+
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        conn = get_db_connection()
+        try:
+            # Get form data
+            business_name = request.form.get('business_name')
+            description = request.form.get('description')
+            phone_number = request.form.get('phone_number')
+            email = request.form.get('email')
+            shop_no = request.form.get('shop_no')
+            block_num = request.form.get('block_num')
+            address = request.form.get('address')
+
+            website_url = request.form.get('website_url')
+            facebook_link = request.form.get('facebook_link')
+            instagram_link = request.form.get('instagram_link')
+            twitter_link = request.form.get('twitter_link')
+
+            file = request.files.get('business_media')
+            # category_ids = request.form.getlist('categories')
+            
+            custom_categories = request.form.get('custom_categories')
+            category_ids = request.form.getlist('categories')
+
+            # Remove 'other' from category IDs
+            category_ids = [cid for cid in category_ids if cid != 'other']
+            
+            
+            base_slug = slugify(business_name)
+
+
+            cur = conn.cursor()
+            
+            slug = generate_unique_slug(cur, base_slug)
+
+
+
+            # Handle media upload
+            media_url = None
+            media_type = None
+            if file and file.filename:
+                media_url = upload_file(file)
+                media_type = 'image'  # Default to image type
+
+            # Insert new business with 'pending' status
+            # cur = conn.cursor()
+            # cur.execute("""
+            #     INSERT INTO businesses (
+            #         owner_id, business_name, description,
+            #         phone_number, email, shop_no, block_num, address,
+            #         website_url, facebook_link, instagram_link, twitter_link, 
+            #         media_type, media_url, status
+            #     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')
+            # """, (
+            #     user_id, business_name, description,
+            #     phone_number, email, shop_no, block_num, address,
+            #     website_url, facebook_link, instagram_link, twitter_link, 
+            #     media_type, media_url
+            # ))
+            
+            cur.execute("""
+                INSERT INTO businesses (
+                    owner_id, business_name, slug, description,
+                    phone_number, email, shop_no, block_num, address,
+                    website_url, facebook_link, instagram_link, twitter_link,
+                    custom_categories, media_type, media_url, status
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')
+            """, (
+                user_id, business_name, slug, description,
+                phone_number, email, shop_no, block_num, address,
+                website_url, facebook_link, instagram_link, twitter_link,
+                custom_categories, media_type, media_url
+            ))
+
+            # Get the newly created business ID
+            business_id = cur.lastrowid
+
+            # Create category relationships
+            for category_id in category_ids:
+                cur.execute("""
+                    INSERT INTO business_categories (business_id, category_id)
+                    VALUES (%s, %s)
+                """, (business_id, category_id))
+            
+            conn.commit()
+            flash('Business submitted for approval!', 'success')
+            return redirect(url_for('user.profile'))
+
+        except Exception as e:
+            conn.rollback()
+            flash(f'Error adding business: {str(e)}', 'error')
+            # Get categories again to render the form with errors
+            cur = conn.cursor(dictionary=True)
+            cur.execute("SELECT id, category_name AS name FROM categories ORDER BY category_name")
+            categories = cur.fetchall()
+            return render_template('business/add_business.html', categories=categories)
+        finally:
+            if conn:
+                conn.close()
+
+    # GET request - fetch categories
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute("SELECT id, category_name AS name FROM categories ORDER BY category_name")
+        categories = cur.fetchall()
+    except Exception as e:
+        flash(f'Error loading categories: {str(e)}', 'error')
+        categories = []
+    finally:
+        if conn:
+            conn.close()
+
+    return render_template('business/add_business.html', categories=categories)
 

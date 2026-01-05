@@ -50,13 +50,13 @@
     <i class="fas fa-users me-1"></i> Manage Users
 </a>
 {% endif %}
-                    <a href="{{ url_for('user.add_business') }}" class="btn btn-success btn-sm w-100 mb-2">
+                    <a href="{{ url_for('business.add_business') }}" class="btn btn-success btn-sm w-100 mb-2">
                         <i class="fas fa-plus me-1"></i> Add Business
                     </a>
                     <button class="btn btn-outline-primary btn-sm w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                         <i class="fas fa-edit me-1"></i> Edit Profile
                     </button>
-                    <a href="{{url_for('auth.logout')}}" class="btn btn-outline-secondary btn-sm w-100">
+                    <a href="{{url_for('auth.logout')}}" class="btn btn-secondary btn-sm w-100">
                         <i class="fas fa-cog me-1"></i> Logout
                     </a>
                 </div>
@@ -159,6 +159,7 @@
                                 </tr>
                                 {% endfor %}
                                 #}
+                                
                                 {% for business in businesses %}
 <tr>
     <td>
@@ -182,11 +183,11 @@
         {% if business.categories %}
         <div class="d-flex flex-wrap gap-1">
             {% for category in business.categories %}
-            <span class="badge bg-secondary">{{ category.name }}</span>
+            <span class="badge bg-dark">{{ category.name }}</span>
             {% endfor %}
         </div>
         {% else %}
-        <span class="text-muted">No categories {{business}} </span>
+        <span class="badge bg-info text-white"> {{business.custom_categories or 'No categories' }} </span>
         {% endif %}
     </td>
     <td>
@@ -200,7 +201,7 @@
     </td>
     <td>
         <a class="dropdown-item" 
-            href="{{ url_for('user.business_profile', business_id=business.id) }}">
+            href="{{ url_for('business.business_profile', business_id=business.id) }}">
             <i class="fas fa-eye me-2"></i>View
         </a>
 

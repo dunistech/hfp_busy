@@ -18,9 +18,6 @@ from flask import abort, session
 serializer = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
 
 
-# 
-# 
-
 def admin_required(f):
     """Decorator to ensure user has admin privileges"""
     @wraps(f)

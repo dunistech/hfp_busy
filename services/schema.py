@@ -1,6 +1,5 @@
 from flask import url_for
 
-
 def business_schema(business):
     return {
         "@context": "https://schema.org",
@@ -38,7 +37,7 @@ def category_schema(category, businesses):
             category_slug=category["slug"],
             _external=True
         ) + "#collection",
-        "name": f'{category["category_name"]} Businesses in Ajah',
+        "name": f'{category["category_name"]} in Ajah',
         "url": url_for(
             "categories.businesses_by_category",
             category_slug=category["slug"],

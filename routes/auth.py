@@ -305,7 +305,7 @@ def register():
             if conn:
                 conn.close()
 
-    return render_template('auth/register_0.html')
+    return render_template('auth/register.html')
 
 def validate_registration(username, email, password, phone):
     """Validate registration form data"""
